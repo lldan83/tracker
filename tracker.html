@@ -1,0 +1,1968 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Goal Tracker</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxODAgMTgwIj4KICA8cmVjdCB3aWR0aD0iMTgwIiBoZWlnaHQ9IjE4MCIgZmlsbD0iI0YxRjVGOSIvPgogIDxwb2x5bGluZSBwb2ludHM9IjMyLDEzMCA2Miw5NiA5MiwxMDQgMTM4LDYwIiBmaWxsPSJub25lIiBzdHJva2U9IiMyNTYzRUIiIHN0cm9rZS13aWR0aD0iMTAiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPgogIDxjaXJjbGUgY3g9IjMyIiBjeT0iMTMwIiByPSI3IiBmaWxsPSIjMjU2M0VCIi8+CiAgPGNpcmNsZSBjeD0iNjIiIGN5PSI5NiIgcj0iNyIgZmlsbD0iIzI1NjNFQiIvPgogIDxjaXJjbGUgY3g9IjkyIiBjeT0iMTA0IiByPSI3IiBmaWxsPSIjMjU2M0VCIi8+CiAgPGNpcmNsZSBjeD0iMTM4IiBjeT0iNjAiIHI9IjkiIGZpbGw9IiMyNTYzRUIiLz4KICA8bGluZSB4MT0iMjYiIHkxPSIxNDgiIHgyPSIxNTIiIHkyPSIxNDgiIHN0cm9rZT0iI0NCRDVFMSIgc3Ryb2tlLXdpZHRoPSI1IiBzdHJva2UtbGluZWNhcD0icm91bmQiLz4KPC9zdmc+">
+<link rel="apple-touch-icon" href="data:image/png;base64,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">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Goal Tracker">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyCN2PkVTU_kyuSIxB_SSlEQdfZBV7tNKEQ",
+    authDomain: "tracker-f86d0.firebaseapp.com",
+    projectId: "tracker-f86d0",
+    storageBucket: "tracker-f86d0.firebasestorage.app",
+    messagingSenderId: "969614750843",
+    appId: "1:969614750843:web:944efc90b5c462ca7b5ede"
+  };
+
+  const fbApp = initializeApp(firebaseConfig);
+  const db = getFirestore(fbApp);
+
+  // 메인 스크립트(non-module)에서 쓸 수 있도록 전역에 노출
+  window.__firestore = { db, doc, getDoc, setDoc };
+  window.dispatchEvent(new Event('firebase-ready'));
+</script>
+<style>
+  :root{
+    --bg:#FAFBFC;
+    --card:#FFFFFF;
+    --blue:#2563EB;
+    --blue-soft:#DBEAFE;
+    --blue-softer:#EFF6FF;
+    --text:#0F172A;
+    --text-sub:#64748B;
+    --text-faint:#94A3B8;
+    --line:#E7EBF0;
+    --red:#DC2626;
+    --green:#16A34A;
+    --radius:18px;
+    --radius-sm:12px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg);
+    color:var(--text);
+    font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Pretendard",sans-serif;
+    -webkit-font-smoothing:antialiased;
+    min-height:100vh;
+  }
+  #app{
+    max-width:480px;
+    margin:0 auto;
+    min-height:100vh;
+    padding-bottom:48px;
+    position:relative;
+  }
+  @media (min-width:860px){
+    #app{max-width:920px;}
+  }
+
+  /* ---------- top bar ---------- */
+  .topbar{
+    position:sticky;
+    top:0;
+    background:rgba(250,251,252,0.92);
+    backdrop-filter:blur(12px);
+    z-index:20;
+    padding:18px 20px 14px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    border-bottom:1px solid transparent;
+  }
+  .topbar.scrolled{border-bottom-color:var(--line);}
+  .topbar .icon-btn{
+    width:36px;height:36px;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    background:transparent;border:none;cursor:pointer;
+    color:var(--text);
+  }
+  .icon-btn:active{background:var(--line);}
+  .topbar h1{
+    font-size:18px;font-weight:700;margin:0;
+    letter-spacing:-0.01em;
+  }
+  .topbar .sub{
+    font-size:12.5px;color:var(--text-sub);font-weight:500;
+    text-align:center;margin-top:2px;
+  }
+  .topbar .titleblock{display:flex;flex-direction:column;align-items:center;flex:1;}
+
+  /* ---------- list view ---------- */
+  .listpad{padding:8px 20px 0;}
+
+  .grid-trackers{
+    display:grid;
+    grid-template-columns:1fr;
+    gap:12px;
+    padding:10px 20px 20px;
+  }
+  @media (min-width:860px){
+    .grid-trackers{grid-template-columns:1fr 1fr;}
+  }
+
+  .cat-section{margin-bottom:4px;}
+  .cat-header{
+    display:flex;align-items:center;justify-content:space-between;
+    margin:18px 24px 2px;
+  }
+  .cat-header-end{justify-content:flex-end;}
+  .cat-title{
+    font-size:13px;font-weight:700;color:var(--blue);
+    letter-spacing:-0.01em;
+  }
+  .cat-title.muted{color:var(--text-faint);}
+
+  .sort-control{position:relative;}
+  .sort-trigger{
+    display:flex;align-items:center;gap:4px;
+    background:var(--bg);border:none;border-radius:8px;
+    padding:5px 9px;font-size:11.5px;font-weight:500;color:var(--text-sub);
+    font-family:inherit;cursor:pointer;
+  }
+  .sort-trigger svg{flex-shrink:0;color:var(--text-sub);}
+  .sort-menu{
+    position:absolute;top:calc(100% + 4px);right:0;z-index:20;
+    background:var(--card);border:1px solid var(--line);border-radius:12px;
+    box-shadow:0 4px 16px rgba(15,23,42,0.08);
+    min-width:128px;padding:4px;
+  }
+  .sort-menu-item{
+    display:flex;align-items:center;justify-content:space-between;gap:8px;
+    padding:8px 9px;font-size:13px;color:var(--text-sub);border-radius:8px;
+    cursor:pointer;white-space:nowrap;
+  }
+  .sort-menu-item:active{background:var(--bg);}
+  .sort-menu-item.active{color:var(--blue);font-weight:600;background:var(--blue-softer);}
+  .sort-menu-item.active svg{color:var(--blue);}
+  .sort-menu-item svg{flex-shrink:0;}
+
+  /* ---------- row list (Strides 스타일 한 줄 리스트) ---------- */
+  .row-list{
+    background:var(--card);
+    border-top:1px solid var(--line);
+    border-bottom:1px solid var(--line);
+  }
+  .row-card{
+    padding:14px 20px 14px;
+    border-bottom:1px solid var(--line);
+    cursor:pointer;
+  }
+  .row-list .row-card:last-child{border-bottom:none;}
+  .row-card:active{background:#F8FAFC;}
+  .row-top{
+    display:flex;justify-content:space-between;align-items:flex-start;gap:10px;
+    margin-bottom:10px;
+  }
+  .row-left{min-width:0;flex:1;}
+  .row-name{font-size:15.5px;font-weight:700;letter-spacing:-0.01em;}
+  .row-sub{font-size:12px;color:var(--text-sub);font-weight:500;margin-top:2px;}
+  .row-right{text-align:right;flex:0 0 auto;}
+  .row-value{font-size:22px;font-weight:800;letter-spacing:-0.02em;line-height:1.15;}
+  .row-pace{font-size:12px;font-weight:700;margin-top:1px;}
+
+  .bar-track.thin{height:7px;border-radius:4px;}
+
+  .bar-track{
+    position:relative;
+    height:10px;border-radius:6px;
+    background:var(--blue-softer);
+    overflow:hidden;
+  }
+  .bar-fill{
+    position:absolute;left:0;top:0;height:100%;
+    background:var(--blue);border-radius:6px;
+    transition:width .4s ease;
+  }
+  .bar-fill.over{background:var(--red);}
+  .bar-today-line{
+    position:absolute;top:-3px;bottom:-3px;width:2px;
+    background:var(--text);opacity:0.55;
+    border-radius:1px;
+  }
+
+  .empty-state{
+    text-align:center;padding:80px 30px 40px;color:var(--text-sub);
+  }
+  .empty-state .emoji{font-size:40px;margin-bottom:14px;}
+  .empty-state h3{font-size:17px;color:var(--text);margin:0 0 8px;font-weight:700;}
+  .empty-state p{font-size:13.5px;line-height:1.6;margin:0;}
+
+  .fab{
+    position:fixed;
+    bottom:28px;right:calc(50% - 240px + 20px);
+    width:56px;height:56px;border-radius:50%;
+    background:var(--blue);color:#fff;border:none;
+    font-size:28px;font-weight:400;
+    display:flex;align-items:center;justify-content:center;
+    box-shadow:0 8px 20px rgba(37,99,235,0.35);
+    cursor:pointer;z-index:30;
+    line-height:0;
+  }
+  @media (max-width:480px){
+    .fab{right:20px;}
+  }
+  @media (min-width:860px){
+    .fab{right:calc(50% - 460px + 24px);}
+  }
+  .fab:active{transform:scale(0.92);}
+
+  /* ---------- detail view ---------- */
+  .view{display:none;}
+  .view.active{display:block;}
+
+  .detail-pad{padding:6px 20px 20px;}
+
+  .tabs{
+    display:flex;gap:4px;background:var(--card);
+    border:1px solid var(--line);
+    border-radius:30px;padding:4px;margin:6px 20px 18px;
+  }
+  .tab-btn{
+    flex:1;border:none;background:transparent;
+    padding:9px 0;border-radius:24px;
+    font-size:13px;font-weight:700;color:var(--text-sub);
+    cursor:pointer;display:flex;align-items:center;justify-content:center;gap:5px;
+  }
+  .tab-btn.active{background:var(--blue);color:#fff;}
+
+  .panel{display:none;}
+  .panel.active{display:block;}
+
+  .pace-label{
+    text-align:center;font-size:13px;color:var(--text-sub);font-weight:600;margin-bottom:10px;
+  }
+  .pace-label b{color:var(--blue);font-weight:800;}
+
+  .big-bar-card{
+    background:var(--card);border:1px solid var(--line);
+    border-radius:var(--radius);padding:18px;position:relative;overflow:hidden;
+  }
+  .big-bar-scale{
+    display:flex;justify-content:space-between;font-size:11.5px;color:var(--text-faint);font-weight:600;margin-bottom:8px;
+  }
+  .big-bar-track{
+    position:relative;height:64px;border-radius:12px;
+    background:var(--blue-softer);overflow:hidden;
+  }
+  .big-bar-fill{
+    position:absolute;left:0;top:0;height:100%;
+    background:var(--blue);border-radius:12px;
+    transition:width .5s ease;
+  }
+  .big-bar-fill.over{background:var(--red);}
+  .big-bar-fill.ahead{background:var(--green);}
+  .fill-label{
+    position:absolute;left:0;top:0;right:0;height:100%;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    text-align:center;pointer-events:none;
+  }
+  .fill-label .ftxt{
+    font-size:11.5px;color:var(--text-sub);font-weight:700;
+    text-shadow:0 0 6px #fff,0 0 6px #fff,0 0 6px #fff,0 0 10px #fff;
+  }
+  .fill-label .fnum{
+    font-size:19px;font-weight:800;color:var(--text);margin-top:1px;
+    text-shadow:0 0 6px #fff,0 0 6px #fff,0 0 6px #fff,0 0 10px #fff;
+  }
+  .big-bar-today{
+    position:absolute;top:-4px;bottom:-4px;width:2px;background:var(--text);opacity:0.5;
+  }
+  .big-bar-dates{
+    display:flex;justify-content:space-between;font-size:11.5px;color:var(--text-faint);font-weight:600;margin-top:8px;
+  }
+
+  .stat-row{display:flex;gap:10px;margin:18px 0;align-items:center;}
+  .stat-row-2{justify-content:center;gap:28px;}
+  .stat-row-2 .stat-box{flex:0 0 auto;min-width:96px;}
+  .stat-box{flex:1;text-align:center;}
+  .stat-box .s-label{font-size:12px;color:var(--text-sub);font-weight:600;}
+  .stat-box .s-value{font-size:24px;font-weight:800;letter-spacing:-0.02em;margin-top:4px;}
+  .stat-box .s-sub{font-size:11.5px;color:var(--text-faint);font-weight:500;margin-top:2px;}
+  .stat-box.mid .s-value{color:var(--red);}
+  .stat-box.right .s-value{color:var(--blue);}
+
+  .donut-wrap{position:relative;width:128px;height:128px;flex:0 0 auto;margin:0 auto;}
+  .donut-wrap svg{transform:rotate(-90deg);}
+  .donut-center{
+    position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  }
+  .donut-center .dc-label{font-size:11.5px;color:var(--text-sub);font-weight:600;}
+  .donut-center .dc-value{font-size:23px;font-weight:800;color:var(--red);letter-spacing:-0.02em;margin-top:1px;}
+  .donut-center .dc-sub{font-size:10.5px;color:var(--text-faint);font-weight:600;margin-top:2px;text-align:center;line-height:1.3;padding:0 8px;}
+
+  .chart-card{
+    background:var(--card);border:1px solid var(--line);
+    border-radius:var(--radius);padding:18px;margin-top:8px;
+  }
+  .chart-head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:14px;}
+  .chart-head .ch-date{font-size:14px;font-weight:700;}
+  .chart-head .ch-pace{font-size:12px;color:var(--text-sub);font-weight:600;margin-top:2px;}
+  .chart-head .ch-val{font-size:20px;font-weight:800;text-align:right;}
+  .chart-head .ch-diff{font-size:11.5px;color:var(--text-faint);font-weight:600;text-align:right;margin-top:2px;}
+
+  /* ---------- log list (기록 탭) ---------- */
+  .log-add-card{
+    background:var(--card);border:1px solid var(--line);
+    border-radius:var(--radius);padding:16px;margin-bottom:14px;
+  }
+  .log-mode-toggle{
+    display:flex;background:var(--blue-softer);border-radius:10px;padding:3px;margin-bottom:12px;
+  }
+  .log-mode-btn{
+    flex:1;border:none;background:transparent;padding:7px 0;border-radius:8px;
+    font-size:12.5px;font-weight:700;color:var(--text-sub);cursor:pointer;
+  }
+  .log-mode-btn.active{background:#fff;color:var(--blue);box-shadow:0 1px 3px rgba(0,0,0,0.08);}
+
+  .field{margin-bottom:12px;}
+  .field label{
+    display:block;font-size:12.5px;font-weight:700;color:var(--text-sub);margin-bottom:6px;
+  }
+  .field input, .field select{
+    width:100%;padding:11px 13px;border-radius:10px;
+    border:1.5px solid var(--line);background:#fff;
+    font-size:15px;color:var(--text);font-weight:600;
+    font-family:inherit;
+  }
+  .field input:focus, .field select:focus{outline:none;border-color:var(--blue);}
+  .field-row{display:flex;gap:10px;}
+  .field-row .field{flex:1;}
+
+  .btn{
+    width:100%;padding:13px 0;border-radius:12px;border:none;
+    background:var(--blue);color:#fff;font-size:15px;font-weight:700;
+    cursor:pointer;font-family:inherit;
+  }
+  .btn:active{opacity:0.85;}
+  .btn.secondary{background:var(--blue-softer);color:var(--blue);}
+  .btn.ghost{background:transparent;color:var(--text-sub);border:1.5px solid var(--line);}
+  .btn.danger{background:#FEE2E2;color:var(--red);}
+  .btn-row{display:flex;gap:10px;}
+  .btn-row .btn{flex:1;}
+
+  .log-entry{
+    display:flex;justify-content:space-between;align-items:center;
+    padding:13px 4px;border-bottom:1px solid var(--line);
+  }
+  .log-entry:last-child{border-bottom:none;}
+  .log-entry .le-date{font-size:13.5px;font-weight:600;color:var(--text);}
+  .log-entry .le-meta{font-size:11.5px;color:var(--text-faint);margin-top:1px;}
+  .log-entry .le-memo{font-size:12px;color:var(--text-sub);margin-top:5px;background:var(--bg);border-radius:7px;padding:3px 8px;display:inline-block;}
+  .log-entry .le-right{display:flex;align-items:center;gap:10px;}
+  .log-entry .le-val{font-size:15px;font-weight:700;}
+  .log-entry .le-val.delta-pos{color:var(--green);}
+  .log-entry .le-val.delta-neg{color:var(--red);}
+  .le-del{
+    width:26px;height:26px;border-radius:50%;border:none;background:transparent;
+    color:var(--text-faint);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;
+  }
+  .le-del:active{background:var(--line);}
+
+  .log-list-card{
+    background:var(--card);border:1px solid var(--line);
+    border-radius:var(--radius);padding:6px 14px;
+  }
+  .section-title{
+    font-size:13px;font-weight:700;color:var(--text-sub);margin:18px 4px 8px;
+  }
+
+  /* ---------- 설정 탭 ---------- */
+  .toggle-row{
+    display:flex;justify-content:space-between;align-items:center;
+    background:var(--card);border:1px solid var(--line);
+    border-radius:var(--radius-sm);padding:14px 16px;margin-bottom:10px;
+  }
+  .toggle-row .tr-label{font-size:14.5px;font-weight:700;}
+  .toggle-row .tr-desc{font-size:12px;color:var(--text-sub);margin-top:2px;line-height:1.4;}
+  .switch{
+    position:relative;width:48px;height:28px;border-radius:16px;
+    background:var(--line);flex:0 0 auto;cursor:pointer;transition:background .2s;
+  }
+  .switch.on{background:var(--blue);}
+  .switch .knob{
+    position:absolute;top:2px;left:2px;width:24px;height:24px;border-radius:50%;
+    background:#fff;box-shadow:0 1px 3px rgba(0,0,0,0.25);transition:left .2s;
+  }
+  .switch.on .knob{left:22px;}
+
+  /* form view (new/edit tracker) */
+  .form-pad{padding:6px 20px 20px;}
+  .seg{
+    display:flex;background:var(--blue-softer);border-radius:10px;padding:3px;margin-bottom:4px;
+  }
+  .seg button{
+    flex:1;border:none;background:transparent;padding:8px 0;border-radius:8px;
+    font-size:13px;font-weight:700;color:var(--text-sub);cursor:pointer;
+  }
+  .seg button.active{background:#fff;color:var(--blue);box-shadow:0 1px 3px rgba(0,0,0,0.08);}
+  .hint{font-size:12px;color:var(--text-faint);margin:6px 2px 0;line-height:1.5;}
+
+  .sync-code-box{
+    display:flex;align-items:center;justify-content:space-between;gap:10px;
+    background:var(--blue-softer);border:1px solid var(--blue-soft);border-radius:var(--radius-sm);
+    padding:14px 16px;margin-bottom:12px;
+  }
+  .sync-code-box .code{font-size:17px;font-weight:800;letter-spacing:0.02em;color:var(--blue);font-family:ui-monospace,monospace;}
+  .sync-code-box .copy-btn{
+    flex:0 0 auto;background:#fff;border:1px solid var(--blue-soft);border-radius:9px;
+    padding:7px 12px;font-size:12.5px;font-weight:700;color:var(--blue);cursor:pointer;font-family:inherit;
+  }
+  .sync-badge{
+    display:inline-flex;align-items:center;gap:5px;font-size:11.5px;font-weight:700;
+    padding:3px 9px;border-radius:20px;margin-bottom:10px;
+  }
+  .sync-badge.connected{background:var(--blue-softer);color:var(--blue);}
+  .sync-badge.off{background:var(--line);color:var(--text-sub);}
+  .sync-badge .dot{width:6px;height:6px;border-radius:50%;background:currentColor;}
+
+  .chip-row{display:flex;flex-wrap:wrap;gap:8px;}
+  .chip{
+    padding:8px 14px;border-radius:20px;
+    background:var(--blue-softer);color:var(--text-sub);
+    font-size:13px;font-weight:700;cursor:pointer;
+    border:1.5px solid transparent;user-select:none;
+  }
+  .chip.active{background:var(--blue);color:#fff;}
+  .chip.add-new{
+    background:transparent;border:1.5px dashed var(--line);color:var(--text-sub);
+  }
+
+  .cat-manage-row{
+    display:flex;align-items:center;gap:10px;
+    background:var(--card);border:1px solid var(--line);
+    border-radius:var(--radius-sm);padding:11px 14px;margin-bottom:8px;
+  }
+  .cat-manage-row input{
+    flex:1;border:none;background:transparent;font-size:14.5px;font-weight:600;
+    color:var(--text);font-family:inherit;padding:2px 0;
+  }
+  .cat-manage-row input:focus{outline:none;}
+  .cat-manage-row .cm-del{
+    width:26px;height:26px;border-radius:50%;border:none;background:transparent;
+    color:var(--text-faint);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;
+    flex:0 0 auto;
+  }
+  .cat-manage-row .cm-del:active{background:var(--line);}
+  .cat-manage-empty{
+    font-size:13px;color:var(--text-faint);text-align:center;padding:14px 0;
+  }
+
+  .top-actions{display:flex;gap:14px;align-items:center;}
+  .text-action{
+    border:none;background:transparent;color:var(--blue);font-size:15px;font-weight:700;cursor:pointer;padding:4px;
+  }
+  .text-action.muted{color:var(--text-sub);}
+
+  /* toast */
+  .toast{
+    position:fixed;bottom:30px;left:50%;transform:translateX(-50%) translateY(20px);
+    background:var(--text);color:#fff;padding:11px 18px;border-radius:30px;
+    font-size:13.5px;font-weight:600;opacity:0;pointer-events:none;
+    transition:opacity .25s, transform .25s;z-index:100;white-space:nowrap;
+    max-width:90vw;
+  }
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+  ::selection{background:var(--blue-soft);}
+</style>
+</head>
+<body>
+
+<div id="app">
+
+  <!-- ============ LIST VIEW ============ -->
+  <div class="view active" id="view-list">
+    <div class="topbar">
+      <div style="width:36px"></div>
+      <div class="titleblock">
+        <h1>내 추적기</h1>
+      </div>
+      <button class="icon-btn" onclick="openSettings()">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M12 15.5a3.5 3.5 0 100-7 3.5 3.5 0 000 7z" stroke="#0F172A" stroke-width="1.8"/><path d="M19.4 13a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V19a2 2 0 11-4 0v-.09a1.65 1.65 0 00-1-1.51 1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H4a2 2 0 110-4h.09a1.65 1.65 0 001.51-1 1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06a1.65 1.65 0 001.82.33h0A1.65 1.65 0 0011 4.09V4a2 2 0 114 0v.09a1.65 1.65 0 001 1.51h0a1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82v0c.27.6.84 1 1.51 1H20a2 2 0 110 4h-.09a1.65 1.65 0 00-1.51 1z" stroke="#0F172A" stroke-width="1.8"/></svg>
+      </button>
+    </div>
+
+    <div id="trackerListWrap">
+      <div class="grid-trackers" id="trackerGrid"></div>
+    </div>
+
+    <div class="empty-state" id="emptyState" style="display:none;">
+      <div class="emoji">🎯</div>
+      <h3>아직 추적기가 없어요</h3>
+      <p>+ 버튼을 눌러 첫 추적기를 만들어보세요.<br>책 페이지 수, 저축액, 운동량 등<br>무엇이든 추적할 수 있어요.</p>
+    </div>
+
+    <button class="fab" onclick="openNewTracker()">+</button>
+  </div>
+
+  <!-- ============ DETAIL VIEW ============ -->
+  <div class="view" id="view-detail">
+    <div class="topbar">
+      <button class="icon-btn" onclick="closeDetail()">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M15 18l-6-6 6-6" stroke="#0F172A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <div class="titleblock">
+        <h1 id="detailTitle">추적기</h1>
+        <div class="sub" id="detailSub"></div>
+      </div>
+      <button class="icon-btn" onclick="openEditTracker()">
+        <svg width="19" height="19" viewBox="0 0 24 24" fill="none"><path d="M17 3a2.85 2.83 0 114 4L7.5 20.5 2 22l1.5-5.5L17 3z" stroke="#0F172A" stroke-width="1.8"/></svg>
+      </button>
+    </div>
+
+    <div class="tabs">
+      <button class="tab-btn active" data-tab="chart" onclick="switchTab('chart')">차트</button>
+      <button class="tab-btn" data-tab="log" onclick="switchTab('log')">기록</button>
+      <button class="tab-btn" data-tab="settings" onclick="switchTab('settings')">설정</button>
+    </div>
+
+    <!-- CHART PANEL -->
+    <div class="panel active" id="panel-chart">
+      <div class="detail-pad">
+        <div class="pace-label">현재 페이스: <b id="paceVal">0</b></div>
+        <div class="big-bar-card">
+          <div class="big-bar-scale" id="bigBarScale"></div>
+          <div class="big-bar-track">
+            <div class="big-bar-fill" id="bigBarFill"></div>
+            <div class="fill-label">
+              <div class="ftxt">진행도</div>
+              <div class="fnum" id="bigBarText">0/0</div>
+            </div>
+            <div class="big-bar-today" id="bigBarToday"></div>
+          </div>
+          <div class="big-bar-dates" id="bigBarDates"></div>
+        </div>
+
+        <div class="stat-row stat-row-2">
+          <div class="stat-box">
+            <div class="s-label">일일 목표</div>
+            <div class="s-value" id="dailyGoalVal">-</div>
+            <div class="s-sub" id="daysLeftVal">-</div>
+          </div>
+          <div class="donut-wrap">
+            <svg width="128" height="128" viewBox="0 0 128 128">
+              <circle cx="64" cy="64" r="54" fill="none" stroke="#EFF6FF" stroke-width="12"/>
+              <circle cx="64" cy="64" r="54" fill="none" stroke="#2563EB" stroke-width="12" stroke-linecap="round" id="donutArc"/>
+            </svg>
+            <div class="donut-center">
+              <div class="dc-label">현재 페이스</div>
+              <div class="dc-value" id="donutCurrent">0</div>
+              <div class="dc-sub" id="donutRemain">남음</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="chart-card">
+          <div class="chart-head">
+            <div>
+              <div class="ch-date" id="chartDateLabel">오늘</div>
+              <div class="ch-pace" id="chartPaceLabel">Pace: -</div>
+            </div>
+            <div>
+              <div class="ch-val" id="chartValLabel">0</div>
+              <div class="ch-diff" id="chartDiffLabel"></div>
+            </div>
+          </div>
+          <svg id="lineChart" viewBox="0 0 600 280" style="width:100%;height:auto;display:block;"></svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- LOG PANEL -->
+    <div class="panel" id="panel-log">
+      <div class="detail-pad">
+        <div class="log-add-card">
+          <div class="log-mode-toggle" id="logModeToggle">
+            <button class="log-mode-btn active" data-mode="set" onclick="setLogMode('set')">대체 (값 입력)</button>
+            <button class="log-mode-btn" data-mode="add" onclick="setLogMode('add')">추가 (증분)</button>
+          </div>
+          <div class="field-row">
+            <div class="field">
+              <label id="logValueLabel">새 값</label>
+              <input type="number" id="logValueInput" placeholder="0" inputmode="decimal">
+            </div>
+            <div class="field">
+              <label>날짜</label>
+              <input type="date" id="logDateInput">
+            </div>
+          </div>
+          <button class="btn" onclick="submitLog()">기록 저장</button>
+          <div class="hint" id="logHint">현재 누적값을 그대로 입력하세요. (예: 통장 잔액)</div>
+          <div class="field" style="margin-top:10px;">
+            <label>메모 <span style="color:var(--text-faint);font-weight:400;">(선택)</span></label>
+            <input type="text" id="logMemoInput" placeholder="예: 테마한국사 1~3강" maxlength="100">
+          </div>
+        </div>
+
+        <div class="section-title">기록 내역</div>
+        <div class="log-list-card" id="logListCard">
+          <div class="log-entry" style="color:var(--text-faint);justify-content:center;">기록이 없어요</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SETTINGS PANEL (per-tracker) -->
+    <div class="panel" id="panel-settings">
+      <div class="detail-pad">
+        <div class="toggle-row">
+          <div>
+            <div class="tr-label">합계에 추가</div>
+            <div class="tr-desc">켜면 기록할 때마다 값이 누적돼요. 끄면 매번 입력한 값으로 대체돼요.</div>
+          </div>
+          <div class="switch" id="includeSumSwitch" onclick="toggleIncludeSum()"><div class="knob"></div></div>
+        </div>
+
+        <div class="toggle-row">
+          <div>
+            <div class="tr-label">기록 입력 기본값</div>
+            <div class="tr-desc">기록 탭에서 기본으로 선택될 입력 방식이에요.</div>
+          </div>
+        </div>
+        <div class="seg" style="margin-bottom:16px;">
+          <button id="defModeSetBtn" class="active" onclick="setDefaultLogMode('set')">대체</button>
+          <button id="defModeAddBtn" onclick="setDefaultLogMode('add')">추가</button>
+        </div>
+
+        <button class="btn danger" onclick="deleteCurrentTracker()" style="margin-top:24px;">이 추적기 삭제</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ FORM VIEW (new/edit tracker) ============ -->
+  <div class="view" id="view-form">
+    <div class="topbar">
+      <button class="text-action muted" onclick="closeForm()">취소</button>
+      <div class="titleblock"><h1 id="formTitle">새 추적기</h1></div>
+      <button class="text-action" onclick="saveTracker()">저장</button>
+    </div>
+    <div class="form-pad">
+      <div class="field">
+        <label>이름</label>
+        <input type="text" id="f-name" placeholder="예: 독서, 저축액, 체중">
+      </div>
+
+      <div class="field-row">
+        <div class="field">
+          <label>시작값</label>
+          <input type="number" id="f-start" placeholder="0" inputmode="decimal">
+        </div>
+        <div class="field">
+          <label>목표값</label>
+          <input type="number" id="f-target" placeholder="100" inputmode="decimal">
+        </div>
+      </div>
+
+      <div class="field-row">
+        <div class="field">
+          <label>시작일</label>
+          <input type="date" id="f-startdate">
+        </div>
+        <div class="field">
+          <label>목표 날짜</label>
+          <input type="date" id="f-targetdate">
+        </div>
+      </div>
+
+      <div class="field">
+        <label>단위 (선택)</label>
+        <input type="text" id="f-unit" placeholder="예: 페이지, 원, kg">
+      </div>
+
+      <div class="field">
+        <label>카테고리 (선택)</label>
+        <div class="chip-row" id="f-categoryChips"></div>
+      </div>
+
+      <div class="toggle-row" style="margin-top:6px;">
+        <div>
+          <div class="tr-label">합계에 추가</div>
+          <div class="tr-desc">켜면 기록할 때마다 값이 누적돼요. 끄면 매번 입력한 값으로 대체돼요.</div>
+        </div>
+        <div class="switch" id="f-includeSwitch" onclick="formToggleInclude()"><div class="knob"></div></div>
+      </div>
+
+      <div class="field" style="margin-top:6px;">
+        <label>기록 입력 기본값</label>
+        <div class="seg">
+          <button type="button" id="f-modeSetBtn" class="active" onclick="formSetMode('set')">대체 (값 그대로)</button>
+          <button type="button" id="f-modeAddBtn" onclick="formSetMode('add')">추가 (증분 합산)</button>
+        </div>
+        <div class="hint">대체: 매번 누적값을 입력 (통장 잔액, 몸무게). 추가: 매번 변화량을 입력해서 더함 (오늘 마신 물, 읽은 페이지 수).</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ APP SETTINGS VIEW ============ -->
+  <div class="view" id="view-settings">
+    <div class="topbar">
+      <button class="icon-btn" onclick="closeSettings()">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M15 18l-6-6 6-6" stroke="#0F172A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <div class="titleblock"><h1>설정</h1></div>
+      <div style="width:36px"></div>
+    </div>
+    <div class="form-pad">
+      <div class="section-title" style="margin-top:0;">카테고리 관리</div>
+      <div class="hint" style="margin:0 2px 12px;">추적기를 묶어서 볼 카테고리를 만들어요. 목록 화면에서 카테고리별로 섹션이 나뉘어 보여요.</div>
+      <div id="categoryManageList"></div>
+      <div class="field-row" style="margin-top:4px;">
+        <div class="field" style="margin-bottom:10px;">
+          <input type="text" id="newCategoryInput" placeholder="새 카테고리 이름">
+        </div>
+        <button class="btn secondary" style="width:auto;padding:0 18px;flex:0 0 auto;height:44px;margin-top:0;" onclick="addCategory()">추가</button>
+      </div>
+
+      <div class="section-title">기기 간 동기화</div>
+      <div class="hint" id="syncStatusHint" style="margin:0 2px 14px;">불러오는 중...</div>
+      <div id="syncManageArea"></div>
+
+      <div class="section-title">데이터 백업</div>
+      <div class="hint" style="margin:0 2px 14px;">이 기기의 모든 추적기 데이터를 파일로 내보내거나, 다른 기기에서 내보낸 파일을 가져올 수 있어요. iCloud 사파리 동기화가 안 맞을 때 사용하세요.</div>
+      <div class="btn-row">
+        <button class="btn secondary" onclick="exportData()">내보내기</button>
+        <button class="btn secondary" onclick="document.getElementById('importFile').click()">가져오기</button>
+      </div>
+      <input type="file" id="importFile" accept="application/json" style="display:none;" onchange="importData(event)">
+      <div class="hint" id="storageInfo" style="margin-top:18px;"></div>
+    </div>
+  </div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ============================================================
+// 추적기 앱 — 로컬 저장 기반, 단일 파일 웹앱
+// ============================================================
+
+const STORAGE_KEY = 'tracker_app_data_v1';
+const SYNC_CODE_KEY = 'tracker_sync_code_v1';
+let syncCode = null; // 연결된 동기화 키 (없으면 null = 로컬 전용)
+let isFirebaseReady = false;
+let isSyncing = false; // 업로드 중 재귀 방지
+
+let state = {
+  trackers: [],  // { id, name, unit, start, target, startDate, targetDate, includeInSum, defaultLogMode, categoryId, logs:[{date, value, mode}] }
+  categories: [], // { id, name }
+  sortSettings: {} // { [categoryId or '__uncategorized__']: { by: 'deadline'|'gap'|'recent'|'dailyGoal', dir: 'asc'|'desc' } }
+};
+
+let currentTrackerId = null;
+let currentLogMode = 'set';
+let formIncludeInSum = false;
+let formLogMode = 'set';
+let formCategoryId = null;
+let editingTrackerId = null; // null이면 새로 만들기
+
+// ---------------- 저장 / 로드 ----------------
+function loadState() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) state = JSON.parse(raw);
+  } catch (e) {
+    console.error('load error', e);
+  }
+  if (!state.trackers) state.trackers = [];
+  if (!state.categories) state.categories = [];
+  if (!state.sortSettings) state.sortSettings = {};
+}
+
+function saveState() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  if (syncCode && isFirebaseReady && !isSyncing) {
+    syncUpload();
+  }
+}
+
+function uid() {
+  return 't_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+}
+
+// ---------------- 기기 간 동기화 (Firebase Firestore) ----------------
+function generateSyncCode() {
+  const part = () => Math.random().toString(36).slice(2, 6);
+  return `${part()}-${part()}-${part()}`;
+}
+
+function loadSyncCode() {
+  syncCode = localStorage.getItem(SYNC_CODE_KEY) || null;
+}
+
+async function syncUpload() {
+  if (!syncCode || !window.__firestore) return;
+  try {
+    isSyncing = true;
+    const { db, doc, setDoc } = window.__firestore;
+    await setDoc(doc(db, 'syncCodes', syncCode), {
+      data: JSON.stringify(state),
+      updatedAt: Date.now()
+    });
+  } catch (e) {
+    console.error('sync upload error', e);
+  } finally {
+    isSyncing = false;
+  }
+}
+
+async function syncDownload(code) {
+  if (!window.__firestore) return { ok: false, reason: 'firebase-not-ready' };
+  try {
+    const { db, doc, getDoc } = window.__firestore;
+    const snap = await getDoc(doc(db, 'syncCodes', code));
+    if (!snap.exists()) return { ok: false, reason: 'not-found' };
+    const remote = snap.data();
+    return { ok: true, state: JSON.parse(remote.data) };
+  } catch (e) {
+    console.error('sync download error', e);
+    return { ok: false, reason: 'error' };
+  }
+}
+
+// "새로 시작하기": 새 키를 만들고 지금 로컬 데이터를 그대로 업로드
+async function syncStartNew() {
+  const code = generateSyncCode();
+  syncCode = code;
+  localStorage.setItem(SYNC_CODE_KEY, code);
+  await syncUpload();
+  renderSyncSection();
+  renderAppSettings();
+  showToast('동기화를 시작했어요');
+}
+
+// "기존 키로 연결하기": 입력한 키의 원격 데이터를 받아와서 로컬을 교체
+async function syncConnectExisting() {
+  const input = document.getElementById('syncCodeInput');
+  const code = (input.value || '').trim();
+  if (!code) { showToast('동기화 키를 입력하세요'); return; }
+  const btn = document.getElementById('syncConnectBtn');
+  if (btn) { btn.disabled = true; btn.textContent = '연결 중...'; }
+  const result = await syncDownload(code);
+  if (btn) { btn.disabled = false; btn.textContent = '연결'; }
+  if (!result.ok) {
+    showToast(result.reason === 'not-found' ? '해당 키를 찾을 수 없어요' : '연결에 실패했어요');
+    return;
+  }
+  state = result.state;
+  if (!state.trackers) state.trackers = [];
+  if (!state.categories) state.categories = [];
+  if (!state.sortSettings) state.sortSettings = {};
+  syncCode = code;
+  localStorage.setItem(SYNC_CODE_KEY, code);
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  renderList();
+  renderSyncSection();
+  renderAppSettings();
+  showToast('연결되어 데이터를 불러왔어요');
+}
+
+function syncDisconnect() {
+  if (!confirm('이 기기를 동기화에서 해제할까요? 이 기기의 데이터는 그대로 남고, 더 이상 다른 기기와 자동으로 맞춰지지 않아요.')) return;
+  syncCode = null;
+  localStorage.removeItem(SYNC_CODE_KEY);
+  renderSyncSection();
+  showToast('동기화가 해제됐어요');
+}
+
+function copySyncCode() {
+  if (!syncCode) return;
+  navigator.clipboard.writeText(syncCode).then(() => showToast('복사했어요')).catch(() => showToast('복사에 실패했어요'));
+}
+
+// 앱 시작 시: 연결된 키가 있으면 최신 원격 데이터를 받아와 화면 갱신
+async function syncPullOnLoad() {
+  if (!syncCode) return;
+  const result = await syncDownload(syncCode);
+  if (result.ok) {
+    const remoteState = result.state;
+    // 매우 단순한 비교: 원격에 updatedAt이 더 최신이면 그걸로 교체
+    // (요구사항상 완전한 충돌 해결은 하지 않음 — 마지막에 동기화된 쪽이 반영됨)
+    state = remoteState;
+    if (!state.trackers) state.trackers = [];
+    if (!state.categories) state.categories = [];
+    if (!state.sortSettings) state.sortSettings = {};
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    renderList();
+  }
+}
+
+function renderSyncSection() {
+  const hint = document.getElementById('syncStatusHint');
+  const area = document.getElementById('syncManageArea');
+  if (!hint || !area) return;
+
+  if (syncCode) {
+    hint.innerHTML = `<span class="sync-badge connected"><span class="dot"></span>연결됨</span><br>이 키를 다른 기기에서 입력하면 같은 데이터를 보고 쓸 수 있어요. 기록을 추가하거나 바꾸면 자동으로 반영돼요.`;
+    area.innerHTML = `
+      <div class="sync-code-box">
+        <span class="code">${escapeHtml(syncCode)}</span>
+        <button class="copy-btn" onclick="copySyncCode()">복사</button>
+      </div>
+      <button class="btn danger" onclick="syncDisconnect()">이 기기 동기화 해제</button>
+    `;
+  } else {
+    hint.innerHTML = `<span class="sync-badge off"><span class="dot"></span>연결 안 됨</span><br>지금은 이 기기에만 데이터가 저장돼요. 동기화를 시작하면 다른 기기와 같은 데이터를 쓸 수 있어요.`;
+    area.innerHTML = `
+      <button class="btn secondary" onclick="syncStartNew()" style="margin-bottom:14px;">이 기기 데이터로 새로 시작하기</button>
+      <div class="field-row">
+        <div class="field" style="margin-bottom:0;">
+          <input type="text" id="syncCodeInput" placeholder="다른 기기의 동기화 키 입력">
+        </div>
+        <button class="btn secondary" id="syncConnectBtn" style="width:auto;padding:0 18px;flex:0 0 auto;height:44px;margin-top:0;" onclick="syncConnectExisting()">연결</button>
+      </div>
+    `;
+  }
+}
+
+// ---------------- 카테고리 ----------------
+function getCategory(id) {
+  return state.categories.find(c => c.id === id);
+}
+
+function addCategory() {
+  const input = document.getElementById('newCategoryInput');
+  const name = input.value.trim();
+  if (!name) { showToast('카테고리 이름을 입력해주세요'); return; }
+  state.categories.push({ id: uid(), name });
+  saveState();
+  input.value = '';
+  renderCategoryManageList();
+  showToast('카테고리를 추가했어요');
+}
+
+function renameCategory(id, newName) {
+  const c = getCategory(id);
+  if (!c) return;
+  const trimmed = newName.trim();
+  if (!trimmed) return;
+  c.name = trimmed;
+  saveState();
+}
+
+function deleteCategory(id) {
+  if (!confirm('이 카테고리를 삭제할까요? 이 카테고리에 속한 추적기는 미분류로 이동해요.')) return;
+  state.categories = state.categories.filter(c => c.id !== id);
+  state.trackers.forEach(t => { if (t.categoryId === id) t.categoryId = null; });
+  saveState();
+  renderCategoryManageList();
+  showToast('카테고리를 삭제했어요');
+}
+
+function renderCategoryManageList() {
+  const wrap = document.getElementById('categoryManageList');
+  if (!wrap) return;
+  if (state.categories.length === 0) {
+    wrap.innerHTML = '<div class="cat-manage-empty">아직 카테고리가 없어요</div>';
+    return;
+  }
+  wrap.innerHTML = state.categories.map(c => `
+    <div class="cat-manage-row">
+      <input type="text" value="${escapeHtml(c.name)}" onchange="renameCategory('${c.id}', this.value)">
+      <button class="cm-del" onclick="deleteCategory('${c.id}')">✕</button>
+    </div>
+  `).join('');
+}
+
+// ---------------- 날짜 유틸 ----------------
+function todayStr() {
+  const d = new Date();
+  return fmtDate(d);
+}
+function fmtDate(d) {
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${y}-${m}-${day}`;
+}
+function parseDate(s) {
+  // 'YYYY-MM-DD' -> local midnight Date
+  const [y, m, d] = s.split('-').map(Number);
+  return new Date(y, m - 1, d);
+}
+function daysBetween(d1, d2) {
+  const a = parseDate(d1);
+  const b = parseDate(d2);
+  return Math.round((b - a) / 86400000);
+}
+// 시작일(자정) ~ 지금(현재 시각)까지의 경과 "일수"를 소수점까지 정밀하게 계산
+function preciseElapsedDays(dateStr) {
+  const start = parseDate(dateStr); // local midnight
+  const now = new Date();
+  const diffMs = now - start;
+  return diffMs / 86400000;
+}
+function shortDate(s) {
+  const d = parseDate(s);
+  return `${d.getMonth() + 1}.${d.getDate()}.`;
+}
+function fullKoreanDate(s) {
+  const d = parseDate(s);
+  return `${d.getFullYear()}년 ${d.getMonth() + 1}월 ${d.getDate()}일`;
+}
+function addDays(s, n) {
+  const d = parseDate(s);
+  d.setDate(d.getDate() + n);
+  return fmtDate(d);
+}
+
+// ---------------- 숫자 포맷 ----------------
+function fmtNum(n) {
+  if (n === null || n === undefined || isNaN(n)) return '0';
+  const rounded = Math.round(n * 100) / 100;
+  if (Math.abs(rounded) >= 1000) {
+    return rounded.toLocaleString('en-US', { maximumFractionDigits: 0 });
+  }
+  return rounded % 1 === 0 ? String(rounded) : String(rounded);
+}
+function fmtCompact(n) {
+  const abs = Math.abs(n);
+  if (abs >= 100000) return (n / 1000).toFixed(0) + 'K';
+  if (abs >= 1000) return (n / 1000).toFixed(abs >= 10000 ? 0 : 1).replace(/\.0$/, '') + 'K';
+  return String(Math.round(n));
+}
+function niceCeil(v) {
+  if (v <= 0) return 1;
+  const exp = Math.floor(Math.log10(v));
+  const base = Math.pow(10, exp);
+  const norm = v / base;
+  let niceNorm;
+  if (norm <= 1) niceNorm = 1;
+  else if (norm <= 2) niceNorm = 2;
+  else if (norm <= 2.5) niceNorm = 2.5;
+  else if (norm <= 5) niceNorm = 5;
+  else niceNorm = 10;
+  return niceNorm * base;
+}
+
+// ============================================================
+// 트래커 계산 로직
+// ============================================================
+
+// 현재까지의 "현재값" 구하기: 가장 최근 로그가 있으면 그 값, 없으면 start값
+function getCurrentValue(tracker) {
+  if (!tracker.logs || tracker.logs.length === 0) return tracker.start;
+  const sorted = [...tracker.logs].sort((a, b) => a.date.localeCompare(b.date) || a.ts - b.ts);
+  return sorted[sorted.length - 1].cumulative;
+}
+
+// "어제까지"(오늘 날짜 제외, 그 이전 모든 날짜)의 누적값. 오늘 입력한 기록은 반영하지 않음.
+function getValueBeforeToday(tracker) {
+  const today = todayStr();
+  const logs = (tracker.logs || []).filter(l => l.date < today).sort((a, b) => a.date.localeCompare(b.date) || a.ts - b.ts);
+  if (logs.length === 0) return tracker.start;
+  return logs[logs.length - 1].cumulative;
+}
+
+// 진행률 (0~1, target>start 가정이지만 역방향도 지원)
+function getProgressRatio(tracker) {
+  const cur = getCurrentValue(tracker);
+  const span = tracker.target - tracker.start;
+  if (span === 0) return 1;
+  const ratio = (cur - tracker.start) / span;
+  return ratio;
+}
+
+// 남은 일수 (오늘과 목표일 모두 포함해서 셈)
+function getRemainingDaysInclusive(tracker) {
+  const today = todayStr();
+  const d = daysBetween(today, tracker.targetDate) + 1;
+  return Math.max(1, d);
+}
+
+// 일일 목표: 어제까지의 누적값 기준으로 매일 재계산되는, 오늘 해야 할 증분량 (소수점)
+function getDailyGoal(tracker) {
+  const valueBeforeToday = getValueBeforeToday(tracker);
+  const remainDays = getRemainingDaysInclusive(tracker);
+  return (tracker.target - valueBeforeToday) / remainDays;
+}
+
+// 목표 페이스: 오늘 자정까지 누적으로 도달해 있어야 할 총량 (목록 화면, 정수로 올림해서 표시)
+function getGoalPaceToday(tracker) {
+  return getValueBeforeToday(tracker) + getDailyGoal(tracker);
+}
+
+// 현재 페이스: 지금 이 순간(분초 포함) 기준 누적 기대값 (상세 화면, 실시간)
+function getCurrentPace(tracker) {
+  const valueBeforeToday = getValueBeforeToday(tracker);
+  const dailyGoal = getDailyGoal(tracker);
+  const now = new Date();
+  const todayMidnight = parseDate(todayStr());
+  const msIntoToday = now - todayMidnight;
+  const ratioOfDay = Math.max(0, Math.min(1, msIntoToday / 86400000));
+  return valueBeforeToday + dailyGoal * ratioOfDay;
+}
+
+// 현재값 - 현재 페이스. 양수면 앞섬, 음수면 뒤처짐.
+function getPaceDiff(tracker) {
+  return getCurrentValue(tracker) - getCurrentPace(tracker);
+}
+
+// 목록용: 현재값 - 목표 페이스(자정 기준, 올림 전 값으로 비교)
+function getGoalPaceDiff(tracker) {
+  return getCurrentValue(tracker) - getGoalPaceToday(tracker);
+}
+
+// 페이스 기준으로 앞서고 있는지 (목표 방향 고려) - 상세화면(실시간) 기준
+function isAheadOfPace(tracker) {
+  const diff = getPaceDiff(tracker);
+  return tracker.target >= tracker.start ? diff >= 0 : diff <= 0;
+}
+
+// 목록용 앞섬 여부 - 목표 페이스(자정 기준) 기준
+function isAheadOfGoalPace(tracker) {
+  const diff = getGoalPaceDiff(tracker);
+  return tracker.target >= tracker.start ? diff >= 0 : diff <= 0;
+}
+
+function getDaysLeft(tracker) {
+  const today = todayStr();
+  let d = daysBetween(today, tracker.targetDate);
+  return d;
+}
+
+function getTotalDays(tracker) {
+  return Math.max(1, daysBetween(tracker.startDate, tracker.targetDate));
+}
+
+function getElapsedDays(tracker) {
+  const today = todayStr();
+  return Math.max(0, daysBetween(tracker.startDate, today));
+}
+
+function isCompleted(tracker) {
+  const cur = getCurrentValue(tracker);
+  if (tracker.target >= tracker.start) return cur >= tracker.target;
+  return cur <= tracker.target;
+}
+
+function isOverdue(tracker) {
+  const today = todayStr();
+  return daysBetween(today, tracker.targetDate) < 0 && !isCompleted(tracker);
+}
+
+// ============================================================
+// 정렬 기능
+// ============================================================
+const SORT_DEFS = {
+  deadline:  { label: '마감일순', defaultDir: 'asc' },
+  gap:       { label: '진행 격차', defaultDir: 'asc' },
+  recent:    { label: '최근 기록', defaultDir: 'desc' },
+  dailyGoal: { label: '오늘 할당량', defaultDir: 'desc' }
+};
+const SORT_GROUP_KEY_UNCATEGORIZED = '__uncategorized__';
+
+// 마지막 기록 날짜(없으면 null)
+function getLastLogDate(tracker) {
+  if (!tracker.logs || tracker.logs.length === 0) return null;
+  const sorted = [...tracker.logs].sort((a, b) => a.date.localeCompare(b.date) || a.ts - b.ts);
+  return sorted[sorted.length - 1].date;
+}
+
+// 정렬 기준별 비교용 raw 값
+function getSortValue(tracker, by) {
+  if (by === 'deadline') return parseDate(tracker.targetDate).getTime();
+  if (by === 'gap') return getGoalPaceDiff(tracker); // 양수=앞섬, 음수=뒤처짐
+  if (by === 'recent') {
+    const d = getLastLogDate(tracker);
+    return d ? parseDate(d).getTime() : -Infinity; // 기록 없으면 가장 오래된 것으로 취급
+  }
+  if (by === 'dailyGoal') return getDailyGoal(tracker);
+  return 0;
+}
+
+function getSortSetting(groupKey) {
+  const s = state.sortSettings[groupKey];
+  if (s && SORT_DEFS[s.by]) return s;
+  return { by: 'deadline', dir: 'asc' };
+}
+
+function setSortSetting(groupKey, by, dir) {
+  state.sortSettings[groupKey] = { by, dir };
+  saveState();
+  renderList();
+}
+
+function sortTrackerGroup(items, groupKey) {
+  const { by, dir } = getSortSetting(groupKey);
+  const sorted = [...items].sort((a, b) => {
+    const va = getSortValue(a, by);
+    const vb = getSortValue(b, by);
+    if (va < vb) return -1;
+    if (va > vb) return 1;
+    return 0;
+  });
+  if (dir === 'desc') sorted.reverse();
+  return sorted;
+}
+
+let openSortMenuKey = null;
+
+function toggleSortMenu(groupKey, event) {
+  if (event) event.stopPropagation();
+  openSortMenuKey = (openSortMenuKey === groupKey) ? null : groupKey;
+  renderList();
+}
+
+function chooseSortOption(groupKey, by, event) {
+  if (event) event.stopPropagation();
+  const current = getSortSetting(groupKey);
+  // 같은 기준을 다시 누르면 방향 토글, 다른 기준이면 그 기준의 기본 방향으로
+  const dir = (current.by === by) ? (current.dir === 'asc' ? 'desc' : 'asc') : SORT_DEFS[by].defaultDir;
+  openSortMenuKey = null;
+  setSortSetting(groupKey, by, dir);
+}
+
+function sortHeaderHtml(groupKey) {
+  const { by, dir } = getSortSetting(groupKey);
+  const isOpen = openSortMenuKey === groupKey;
+  const arrowIcon = dir === 'asc'
+    ? '<path d="M12 19V5M5 12l7-7 7 7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>'
+    : '<path d="M12 5v14M5 12l7 7 7-7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>';
+
+  const menuItems = Object.keys(SORT_DEFS).map(key => {
+    const active = key === by;
+    return `<div class="sort-menu-item${active ? ' active' : ''}" onclick="chooseSortOption('${groupKey}','${key}',event)">
+      <span>${SORT_DEFS[key].label}</span>
+      ${active ? `<svg width="14" height="14" viewBox="0 0 24 24">${arrowIcon}</svg>` : ''}
+    </div>`;
+  }).join('');
+
+  return `
+    <div class="sort-control">
+      <button class="sort-trigger" onclick="toggleSortMenu('${groupKey}',event)">
+        <span>${SORT_DEFS[by].label}</span>
+        <svg width="13" height="13" viewBox="0 0 24 24">${arrowIcon}</svg>
+      </button>
+      ${isOpen ? `<div class="sort-menu">${menuItems}</div>` : ''}
+    </div>`;
+}
+
+// ============================================================
+// 뷰 전환
+// ============================================================
+function showView(id) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+function openSettings() {
+  renderAppSettings();
+  renderCategoryManageList();
+  renderSyncSection();
+  showView('view-settings');
+}
+function closeSettings() {
+  showView('view-list');
+}
+
+// ============================================================
+// 리스트 뷰 렌더링
+// ============================================================
+function renderList() {
+  const wrap = document.getElementById('trackerListWrap');
+  const empty = document.getElementById('emptyState');
+
+  if (state.trackers.length === 0) {
+    wrap.innerHTML = '';
+    empty.style.display = 'block';
+    return;
+  }
+  empty.style.display = 'none';
+
+  // 카테고리별 그룹화: 카테고리 순서대로, 마지막에 미분류
+  const byCategory = new Map();
+  state.categories.forEach(c => byCategory.set(c.id, []));
+  const uncategorized = [];
+  state.trackers.forEach(t => {
+    if (t.categoryId && byCategory.has(t.categoryId)) {
+      byCategory.get(t.categoryId).push(t);
+    } else {
+      uncategorized.push(t);
+    }
+  });
+
+  let html = '';
+  state.categories.forEach(c => {
+    const items = byCategory.get(c.id);
+    if (!items || items.length === 0) return;
+    const sorted = sortTrackerGroup(items, c.id);
+    html += `<div class="cat-section">
+      <div class="cat-header">
+        <div class="cat-title">${escapeHtml(c.name)}</div>
+        ${sortHeaderHtml(c.id)}
+      </div>
+      <div class="row-list">${sorted.map(t => trackerCardHtml(t)).join('')}</div>
+    </div>`;
+  });
+  if (uncategorized.length > 0) {
+    const sortedUncat = sortTrackerGroup(uncategorized, SORT_GROUP_KEY_UNCATEGORIZED);
+    // 카테고리가 하나도 없으면 "미분류" 헤더 없이 정렬 컨트롤만 보여줌
+    if (state.categories.length === 0) {
+      html += `<div class="cat-section">
+        <div class="cat-header cat-header-end">
+          ${sortHeaderHtml(SORT_GROUP_KEY_UNCATEGORIZED)}
+        </div>
+        <div class="row-list">${sortedUncat.map(t => trackerCardHtml(t)).join('')}</div>
+      </div>`;
+    } else {
+      html += `<div class="cat-section">
+        <div class="cat-header">
+          <div class="cat-title muted">미분류</div>
+          ${sortHeaderHtml(SORT_GROUP_KEY_UNCATEGORIZED)}
+        </div>
+        <div class="row-list">${sortedUncat.map(t => trackerCardHtml(t)).join('')}</div>
+      </div>`;
+    }
+  }
+
+  wrap.innerHTML = html;
+}
+
+function trackerCardHtml(t) {
+  const cur = getCurrentValue(t);
+  const ratio = getProgressRatio(t);
+  const pct = Math.max(0, Math.min(1, ratio));
+
+  // 검은선(목표 페이스 위치): "오늘까지 도달해 있어야 하는 값"을 막대와 같은 값 기준 척도로 환산
+  const goalPace = getGoalPaceToday(t);
+  const span = t.target - t.start;
+  const goalPacePct = span === 0 ? 100 : Math.max(0, Math.min(100, ((goalPace - t.start) / span) * 100));
+  const ahead = isAheadOfGoalPace(t);
+  const overdue = isOverdue(t) && !isCompleted(t);
+  const completed = isCompleted(t);
+
+  let valueColor = 'var(--text)';
+  let paceColor = 'var(--text-faint)';
+  let barClass = '';
+  if (completed) {
+    valueColor = 'var(--green)';
+    barClass = 'ahead';
+  } else if (overdue) {
+    valueColor = 'var(--red)';
+    barClass = 'over';
+  } else if (ahead) {
+    valueColor = 'var(--green)';
+    paceColor = 'var(--green)';
+    barClass = 'ahead';
+  } else {
+    paceColor = 'var(--red)';
+  }
+
+  const goalPaceRounded = t.target >= t.start ? Math.ceil(goalPace) : Math.floor(goalPace);
+
+  return `
+    <div class="row-card" onclick="openDetail('${t.id}')">
+      <div class="row-top">
+        <div class="row-left">
+          <div class="row-name">${escapeHtml(t.name)}</div>
+          <div class="row-sub">목표: ${fullKoreanDate(t.targetDate)}까지 ${fmtCompact(t.target)}${t.unit ? ' ' + escapeHtml(t.unit) : ''}</div>
+        </div>
+        <div class="row-right">
+          <div class="row-value" style="color:${valueColor};">${fmtCompact(cur)}</div>
+          <div class="row-pace" style="color:${paceColor};">목표 페이스: ${fmtCompact(goalPaceRounded)}</div>
+        </div>
+      </div>
+      <div class="bar-track thin">
+        <div class="bar-fill ${barClass}" style="width:${pct * 100}%;"></div>
+        <div class="bar-today-line" style="left:${goalPacePct}%;"></div>
+      </div>
+    </div>`;
+}
+
+function escapeHtml(s) {
+  const div = document.createElement('div');
+  div.textContent = s;
+  return div.innerHTML;
+}
+
+// ============================================================
+// 디테일 뷰
+// ============================================================
+function openDetail(id) {
+  currentTrackerId = id;
+  const t = getTracker(id);
+  currentLogMode = t.defaultLogMode || 'set';
+  switchTab('chart', true);
+  renderDetail();
+  showView('view-detail');
+}
+
+function closeDetail() {
+  currentTrackerId = null;
+  renderList();
+  showView('view-list');
+}
+
+function getTracker(id) {
+  return state.trackers.find(t => t.id === id);
+}
+
+function switchTab(tab, skipShow) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('panel-' + tab).classList.add('active');
+  if (tab === 'log') renderLogPanel();
+  if (tab === 'settings') renderSettingsPanel();
+  if (tab === 'chart') renderChartPanel();
+}
+
+function renderDetail() {
+  const t = getTracker(currentTrackerId);
+  if (!t) return;
+  document.getElementById('detailTitle').textContent = t.name;
+  document.getElementById('detailSub').textContent = `${fullKoreanDate(t.targetDate)}까지 ${fmtNum(t.target)}${t.unit || ''}`;
+  renderChartPanel();
+}
+
+function renderChartPanel() {
+  const t = getTracker(currentTrackerId);
+  if (!t) return;
+  const cur = getCurrentValue(t);
+  const dailyGoal = getDailyGoal(t);
+  const currentPace = getCurrentPace(t);
+  const ratio = getProgressRatio(t);
+  const pct = Math.max(0, Math.min(1, ratio));
+  const ahead = isAheadOfPace(t);
+  const paceDiff = getPaceDiff(t);
+
+  document.getElementById('paceVal').textContent = fmtNum(Math.abs(currentPace));
+
+  // big bar scale
+  const target = t.target, start = t.start;
+  const scaleSteps = 4;
+  const scaleVals = [];
+  for (let i = 0; i <= scaleSteps; i++) {
+    scaleVals.push(start + (target - start) * (i / scaleSteps));
+  }
+  document.getElementById('bigBarScale').innerHTML = scaleVals.map(v => `<span>${fmtCompact(v)}</span>`).join('');
+
+  document.getElementById('bigBarFill').style.width = (pct * 100) + '%';
+  document.getElementById('bigBarFill').classList.toggle('over', isOverdue(t) && !isCompleted(t));
+  document.getElementById('bigBarFill').classList.toggle('ahead', ahead && !isOverdue(t));
+  const bigBarTextEl = document.getElementById('bigBarText');
+  bigBarTextEl.textContent = `${fmtNum(cur)}/${fmtNum(target)}`;
+  bigBarTextEl.style.fontSize = bigBarTextEl.textContent.length > 16 ? '15px' : (bigBarTextEl.textContent.length > 12 ? '17px' : '19px');
+
+  const totalSpan = daysBetween(t.startDate, t.targetDate) || 1;
+  const elapsed = Math.max(0, Math.min(totalSpan, daysBetween(t.startDate, todayStr())));
+  const todayPct = Math.max(0, Math.min(100, (elapsed / totalSpan) * 100));
+  document.getElementById('bigBarToday').style.left = todayPct + '%';
+
+  // 날짜 라벨: 전체 일수를 정수 날짜 단위로 4개 구간으로 나눔 (소수점 오차 방지)
+  const labelDays = [0, 1, 2, 3, 4].map(i => Math.round(totalSpan * i / 4));
+  document.getElementById('bigBarDates').innerHTML =
+    labelDays.map(d => `<span>${shortDate(addDays(t.startDate, d))}</span>`).join('');
+
+  // stats row
+  const daysLeft = getDaysLeft(t);
+  document.getElementById('dailyGoalVal').textContent = fmtNum(Math.abs(dailyGoal));
+  document.getElementById('daysLeftVal').textContent = daysLeft >= 0 ? `${daysLeft}일 남았습니다` : `${Math.abs(daysLeft)}일 지났습니다`;
+
+  const donutCurEl = document.getElementById('donutCurrent');
+  donutCurEl.textContent = fmtNum(currentPace);
+  donutCurEl.style.fontSize = donutCurEl.textContent.length > 7 ? '17px' : (donutCurEl.textContent.length > 5 ? '20px' : '23px');
+  donutCurEl.style.color = ahead ? 'var(--green)' : 'var(--red)';
+  const donutRemainEl = document.getElementById('donutRemain');
+  donutRemainEl.textContent = ahead ? `현재값 ${fmtNum(cur)}, ${fmtCompact(Math.abs(paceDiff))} 앞섬` : `현재값 ${fmtNum(cur)}, ${fmtCompact(Math.abs(paceDiff))} 뒤처짐`;
+
+  const circumference = 2 * Math.PI * 54;
+  const arc = document.getElementById('donutArc');
+  const clamped = Math.max(0, Math.min(1, pct));
+  arc.setAttribute('stroke-dasharray', `${circumference * clamped} ${circumference}`);
+  arc.setAttribute('stroke', ahead ? '#16A34A' : '#2563EB');
+
+  // line chart head
+  document.getElementById('chartDateLabel').textContent = fullKoreanDate(todayStr());
+  document.getElementById('chartPaceLabel').textContent = `현재 페이스: ${fmtNum(Math.abs(currentPace))}`;
+  const chartValEl = document.getElementById('chartValLabel');
+  chartValEl.textContent = fmtNum(cur);
+  chartValEl.style.color = ahead ? 'var(--green)' : 'var(--text)';
+  document.getElementById('chartDiffLabel').textContent = ahead ? `${fmtCompact(Math.abs(paceDiff))} 점 앞서` : `${fmtCompact(Math.abs(paceDiff))} 뒤에`;
+
+  drawLineChart(t);
+}
+
+// ---------------- 라인 차트 (SVG) ----------------
+function drawLineChart(t) {
+  const svg = document.getElementById('lineChart');
+  const W = 600, H = 280;
+  const padL = 46, padR = 10, padT = 14, padB = 26;
+  const plotW = W - padL - padR;
+  const plotH = H - padT - padB;
+
+  const startDate = t.startDate, targetDate = t.targetDate;
+  const totalDays = Math.max(1, daysBetween(startDate, targetDate));
+  let yMax = Math.max(t.target, t.start, getCurrentValue(t)) * 1.08 || 1;
+  let yMin = Math.min(t.start, 0);
+  yMax = niceCeil(yMax);
+
+  function xForDate(dstr) {
+    const d = Math.max(0, Math.min(totalDays, daysBetween(startDate, dstr)));
+    return padL + (d / totalDays) * plotW;
+  }
+  function yForVal(v) {
+    const ratio = (v - yMin) / (yMax - yMin || 1);
+    return padT + plotH - ratio * plotH;
+  }
+
+  // ideal pace line (dotted): start -> target
+  const idealPath = `M ${xForDate(startDate)} ${yForVal(t.start)} L ${xForDate(targetDate)} ${yForVal(t.target)}`;
+
+  // actual progress line (logs sorted, plus start point)
+  const logs = (t.logs || []).slice().sort((a, b) => a.date.localeCompare(b.date));
+  let points = [{ date: startDate, value: t.start }];
+  logs.forEach(l => points.push({ date: l.date, value: l.cumulative }));
+  // dedupe same-date keep last
+  const dedup = [];
+  points.forEach(p => {
+    if (dedup.length && dedup[dedup.length - 1].date === p.date) dedup[dedup.length - 1] = p;
+    else dedup.push(p);
+  });
+  points = dedup;
+
+  let actualPath = '';
+  points.forEach((p, i) => {
+    const x = xForDate(p.date);
+    const y = yForVal(p.value);
+    actualPath += (i === 0 ? 'M' : 'L') + ` ${x} ${y} `;
+  });
+
+  // grid lines (y axis labels)
+  const gridCount = 4;
+  let gridHtml = '';
+  let yLabelsHtml = '';
+  for (let i = 0; i <= gridCount; i++) {
+    const val = yMin + (yMax - yMin) * (i / gridCount);
+    const y = yForVal(val);
+    gridHtml += `<line x1="${padL}" y1="${y}" x2="${W - padR}" y2="${y}" stroke="#EEF1F5" stroke-width="1"/>`;
+    yLabelsHtml += `<text x="${padL - 8}" y="${y + 4}" font-size="11" fill="#94A3B8" text-anchor="end" font-weight="600">${fmtCompact(val)}</text>`;
+  }
+
+  // x axis date labels
+  const xLabelCount = 5;
+  let xLabelsHtml = '';
+  for (let i = 0; i <= xLabelCount; i++) {
+    const dstr = addDays(startDate, Math.round(totalDays * (i / xLabelCount)));
+    const x = xForDate(dstr);
+    xLabelsHtml += `<text x="${x}" y="${H - 6}" font-size="11" fill="#94A3B8" text-anchor="middle" font-weight="600">${shortDate(dstr)}</text>`;
+  }
+
+  // target line (green, horizontal)
+  const targetY = yForVal(t.target);
+
+  // today vertical marker
+  const todayX = xForDate(todayStr());
+
+  // dot at last actual point
+  const lastP = points[points.length - 1];
+  const lastX = xForDate(lastP.date);
+  const lastY = yForVal(lastP.value);
+  const ahead = isAheadOfPace(t);
+  const lineColor = ahead ? '#16A34A' : '#2563EB';
+
+  // 영역 채움 (actualPath를 닫아서 area로)
+  const baselineY = yForVal(yMin);
+  const areaPath = actualPath + ` L ${lastX} ${baselineY} L ${xForDate(points[0].date)} ${baselineY} Z`;
+  const gradientId = 'areaGrad_' + t.id;
+
+  svg.innerHTML = `
+    <defs>
+      <linearGradient id="${gradientId}" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="${lineColor}" stop-opacity="0.22"/>
+        <stop offset="100%" stop-color="${lineColor}" stop-opacity="0"/>
+      </linearGradient>
+    </defs>
+    ${gridHtml}
+    <line x1="${padL}" y1="${targetY}" x2="${W - padR}" y2="${targetY}" stroke="#16A34A" stroke-width="1.5"/>
+    <path d="${idealPath}" fill="none" stroke="#94A3B8" stroke-width="1.5" stroke-dasharray="4 5"/>
+    <path d="${areaPath}" fill="url(#${gradientId})" stroke="none"/>
+    <path d="${actualPath}" fill="none" stroke="${lineColor}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+    <line x1="${todayX}" y1="${padT}" x2="${todayX}" y2="${H - padB}" stroke="#0F172A" stroke-width="1" stroke-opacity="0.18"/>
+    <circle cx="${lastX}" cy="${lastY}" r="4.5" fill="${lineColor}" stroke="#fff" stroke-width="2"/>
+    ${yLabelsHtml}
+    ${xLabelsHtml}
+  `;
+}
+
+// ---------------- 기록(로그) 패널 ----------------
+function setLogMode(mode) {
+  currentLogMode = mode;
+  document.querySelectorAll('#logModeToggle .log-mode-btn').forEach(b => b.classList.toggle('active', b.dataset.mode === mode));
+  const label = document.getElementById('logValueLabel');
+  const hint = document.getElementById('logHint');
+  const t = getTracker(currentTrackerId);
+  if (mode === 'set') {
+    label.textContent = '새 값';
+    hint.textContent = '현재 누적값을 그대로 입력하세요. (예: 통장 잔액)';
+  } else {
+    label.textContent = `오늘 추가할 양${t && t.unit ? ' (' + t.unit + ')' : ''}`;
+    hint.textContent = '이전 누적값에 더해질 증분값을 입력하세요. (예: 오늘 읽은 페이지 수)';
+  }
+}
+
+function renderLogPanel() {
+  const t = getTracker(currentTrackerId);
+  if (!t) return;
+  document.getElementById('logDateInput').value = todayStr();
+  setLogMode(t.defaultLogMode || 'set');
+
+  const logs = (t.logs || []).slice().sort((a, b) => b.date.localeCompare(a.date) || b.ts - a.ts);
+  const card = document.getElementById('logListCard');
+  if (logs.length === 0) {
+    card.innerHTML = `<div class="log-entry" style="color:var(--text-faint);justify-content:center;">기록이 없어요</div>`;
+    return;
+  }
+  card.innerHTML = logs.map(l => {
+    const deltaClass = l.delta > 0 ? 'delta-pos' : (l.delta < 0 ? 'delta-neg' : '');
+    const deltaSign = l.delta > 0 ? '+' : '';
+    return `
+      <div class="log-entry">
+        <div>
+          <div class="le-date">${shortDate(l.date)}</div>
+          <div class="le-meta">${l.mode === 'add' ? '추가' : '대체'} · 누적 ${fmtNum(l.cumulative)}</div>
+          ${l.memo ? `<div class="le-memo">${escapeHtml(l.memo)}</div>` : ''}
+        </div>
+        <div class="le-right">
+          <div class="le-val ${deltaClass}">${deltaSign}${fmtNum(l.delta)}${t.unit || ''}</div>
+          <button class="le-del" onclick="deleteLog('${l.id}')">✕</button>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function submitLog() {
+  const t = getTracker(currentTrackerId);
+  if (!t) return;
+  const valInput = document.getElementById('logValueInput');
+  const dateInput = document.getElementById('logDateInput');
+  const rawVal = parseFloat(valInput.value);
+  if (isNaN(rawVal)) {
+    showToast('값을 입력해주세요');
+    return;
+  }
+  const date = dateInput.value || todayStr();
+
+  // 이 날짜 이전의 가장 최근 누적값 찾기 (대체/추가 기준점)
+  const priorCumulative = getCumulativeBefore(t, date);
+
+  let cumulative, delta;
+  if (currentLogMode === 'set') {
+    cumulative = rawVal;
+    delta = cumulative - priorCumulative;
+  } else {
+    delta = rawVal;
+    cumulative = priorCumulative + rawVal;
+  }
+
+  if (!t.logs) t.logs = [];
+  const memoInput = document.getElementById('logMemoInput');
+  const memo = memoInput ? memoInput.value.trim() : '';
+  t.logs.push({
+    id: uid(),
+    date,
+    mode: currentLogMode,
+    delta,
+    cumulative,
+    memo: memo || null,
+    ts: Date.now()
+  });
+
+  // 이후 날짜의 로그들(추가 모드였던 것들)은 재계산 필요할 수 있으나,
+  // 단순화를 위해 매 기록은 "그 시점 기준"으로 저장하고 정렬 시 그대로 사용.
+  recalcCumulatives(t);
+
+  saveState();
+  valInput.value = '';
+  if (memoInput) memoInput.value = '';
+  showToast('기록을 저장했어요');
+  renderLogPanel();
+  renderChartPanel();
+}
+
+function getCumulativeBefore(t, date) {
+  const logs = (t.logs || []).filter(l => l.date <= date).sort((a, b) => a.date.localeCompare(b.date) || a.ts - b.ts);
+  if (logs.length === 0) return t.start;
+  return logs[logs.length - 1].cumulative;
+}
+
+// 로그를 날짜순 정렬 후, add 모드 로그들의 cumulative를 그 이전 시점 기준으로 재계산
+function recalcCumulatives(t) {
+  const logs = (t.logs || []).slice().sort((a, b) => a.date.localeCompare(b.date) || a.ts - b.ts);
+  let running = t.start;
+  logs.forEach(l => {
+    if (l.mode === 'add') {
+      l.cumulative = running + l.delta;
+    } else {
+      l.delta = l.cumulative - running; // set 모드는 cumulative가 기준, delta 재계산
+    }
+    running = l.cumulative;
+  });
+  t.logs = logs;
+}
+
+function deleteLog(logId) {
+  const t = getTracker(currentTrackerId);
+  if (!t) return;
+  t.logs = (t.logs || []).filter(l => l.id !== logId);
+  recalcCumulatives(t);
+  saveState();
+  renderLogPanel();
+  renderChartPanel();
+  showToast('기록을 삭제했어요');
+}
+
+// ---------------- 설정 패널 (트래커별) ----------------
+function renderSettingsPanel() {
+  const t = getTracker(currentTrackerId);
+  if (!t) return;
+  document.getElementById('includeSumSwitch').classList.toggle('on', !!t.includeInSum);
+  document.getElementById('defModeSetBtn').classList.toggle('active', (t.defaultLogMode || 'set') === 'set');
+  document.getElementById('defModeAddBtn').classList.toggle('active', t.defaultLogMode === 'add');
+}
+
+function toggleIncludeSum() {
+  const t = getTracker(currentTrackerId);
+  if (!t) return;
+  t.includeInSum = !t.includeInSum;
+  saveState();
+  renderSettingsPanel();
+}
+
+function setDefaultLogMode(mode) {
+  const t = getTracker(currentTrackerId);
+  if (!t) return;
+  t.defaultLogMode = mode;
+  saveState();
+  renderSettingsPanel();
+}
+
+function deleteCurrentTracker() {
+  if (!confirm('이 추적기를 삭제할까요? 모든 기록이 함께 삭제돼요.')) return;
+  state.trackers = state.trackers.filter(t => t.id !== currentTrackerId);
+  saveState();
+  closeDetail();
+  showToast('추적기를 삭제했어요');
+}
+
+// ============================================================
+// 폼 뷰 (새로 만들기 / 수정)
+// ============================================================
+function openNewTracker() {
+  editingTrackerId = null;
+  document.getElementById('formTitle').textContent = '새 추적기';
+  document.getElementById('f-name').value = '';
+  document.getElementById('f-start').value = '0';
+  document.getElementById('f-target').value = '';
+  document.getElementById('f-startdate').value = todayStr();
+  document.getElementById('f-targetdate').value = addDays(todayStr(), 30);
+  document.getElementById('f-unit').value = '';
+  formIncludeInSum = false;
+  formLogMode = 'set';
+  formCategoryId = null;
+  updateFormToggleUI();
+  renderCategoryChips();
+  showView('view-form');
+}
+
+function openEditTracker() {
+  const t = getTracker(currentTrackerId);
+  if (!t) return;
+  editingTrackerId = t.id;
+  document.getElementById('formTitle').textContent = '추적기 수정';
+  document.getElementById('f-name').value = t.name;
+  document.getElementById('f-start').value = t.start;
+  document.getElementById('f-target').value = t.target;
+  document.getElementById('f-startdate').value = t.startDate;
+  document.getElementById('f-targetdate').value = t.targetDate;
+  document.getElementById('f-unit').value = t.unit || '';
+  formIncludeInSum = !!t.includeInSum;
+  formLogMode = t.defaultLogMode || 'set';
+  formCategoryId = t.categoryId || null;
+  updateFormToggleUI();
+  renderCategoryChips();
+  showView('view-form');
+}
+
+function formToggleInclude() {
+  formIncludeInSum = !formIncludeInSum;
+  updateFormToggleUI();
+}
+function formSetMode(mode) {
+  formLogMode = mode;
+  updateFormToggleUI();
+}
+function updateFormToggleUI() {
+  document.getElementById('f-includeSwitch').classList.toggle('on', formIncludeInSum);
+  document.getElementById('f-modeSetBtn').classList.toggle('active', formLogMode === 'set');
+  document.getElementById('f-modeAddBtn').classList.toggle('active', formLogMode === 'add');
+}
+
+function renderCategoryChips() {
+  const wrap = document.getElementById('f-categoryChips');
+  if (!wrap) return;
+  let html = `<div class="chip ${!formCategoryId ? 'active' : ''}" onclick="selectFormCategory(null)">없음</div>`;
+  state.categories.forEach(c => {
+    html += `<div class="chip ${formCategoryId === c.id ? 'active' : ''}" onclick="selectFormCategory('${c.id}')">${escapeHtml(c.name)}</div>`;
+  });
+  html += `<div class="chip add-new" onclick="quickAddCategory()">+ 새로</div>`;
+  wrap.innerHTML = html;
+}
+
+function selectFormCategory(id) {
+  formCategoryId = id;
+  renderCategoryChips();
+}
+
+function quickAddCategory() {
+  const name = prompt('새 카테고리 이름을 입력하세요');
+  if (!name || !name.trim()) return;
+  const c = { id: uid(), name: name.trim() };
+  state.categories.push(c);
+  saveState();
+  formCategoryId = c.id;
+  renderCategoryChips();
+}
+
+function closeForm() {
+  if (editingTrackerId) {
+    showView('view-detail');
+  } else {
+    showView('view-list');
+  }
+}
+
+function saveTracker() {
+  const name = document.getElementById('f-name').value.trim();
+  const start = parseFloat(document.getElementById('f-start').value);
+  const target = parseFloat(document.getElementById('f-target').value);
+  const startDate = document.getElementById('f-startdate').value;
+  const targetDate = document.getElementById('f-targetdate').value;
+  const unit = document.getElementById('f-unit').value.trim();
+
+  if (!name) { showToast('이름을 입력해주세요'); return; }
+  if (isNaN(start) || isNaN(target)) { showToast('시작값과 목표값을 입력해주세요'); return; }
+  if (!startDate || !targetDate) { showToast('날짜를 선택해주세요'); return; }
+  if (daysBetween(startDate, targetDate) <= 0) { showToast('목표 날짜는 시작일보다 나중이어야 해요'); return; }
+
+  if (editingTrackerId) {
+    const t = getTracker(editingTrackerId);
+    t.name = name; t.start = start; t.target = target;
+    t.startDate = startDate; t.targetDate = targetDate; t.unit = unit;
+    t.includeInSum = formIncludeInSum;
+    t.defaultLogMode = formLogMode;
+    t.categoryId = formCategoryId;
+    saveState();
+    showToast('수정했어요');
+    showView('view-detail');
+    renderDetail();
+  } else {
+    const t = {
+      id: uid(), name, start, target, startDate, targetDate, unit,
+      includeInSum: formIncludeInSum,
+      defaultLogMode: formLogMode,
+      categoryId: formCategoryId,
+      logs: []
+    };
+    state.trackers.push(t);
+    saveState();
+    showToast('추적기를 만들었어요');
+    showView('view-list');
+    renderList();
+  }
+}
+
+// ============================================================
+// 앱 설정 (백업/복원)
+// ============================================================
+function renderAppSettings() {
+  const bytes = new Blob([JSON.stringify(state)]).size;
+  const whereText = syncCode
+    ? '이 데이터는 동기화 키로 연결된 모든 기기에 함께 저장돼요.'
+    : `이 데이터는 이 브라우저(${navigator.userAgent.includes('Safari') && !navigator.userAgent.includes('Chrome') ? 'Safari' : '현재 브라우저'})에만 저장돼요.`;
+  document.getElementById('storageInfo').textContent =
+    `현재 ${state.trackers.length}개 추적기, 저장 용량 약 ${(bytes / 1024).toFixed(1)}KB 사용 중. ${whereText}`;
+}
+
+function exportData() {
+  const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `tracker-backup-${todayStr()}.json`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  showToast('백업 파일을 내보냈어요');
+}
+
+function importData(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    try {
+      const imported = JSON.parse(e.target.result);
+      if (!imported.trackers) throw new Error('invalid');
+      if (!confirm(`${imported.trackers.length}개의 추적기를 가져옵니다. 현재 데이터를 덮어쓸까요?`)) return;
+      state = imported;
+      saveState();
+      showToast('데이터를 가져왔어요');
+      renderAppSettings();
+      renderList();
+    } catch (err) {
+      showToast('파일을 읽을 수 없어요');
+    }
+  };
+  reader.readAsText(file);
+  event.target.value = '';
+}
+
+// ============================================================
+// 토스트
+// ============================================================
+let toastTimer = null;
+function showToast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('show'), 1800);
+}
+
+// ============================================================
+// 초기화
+// ============================================================
+function init() {
+  loadState();
+  loadSyncCode();
+  renderList();
+  document.addEventListener('click', () => {
+    if (openSortMenuKey !== null) {
+      openSortMenuKey = null;
+      renderList();
+    }
+  });
+
+  // Firebase 모듈 스크립트가 준비되면: 연결된 키가 있으면 최신 데이터를 백그라운드로 받아옴
+  function onFirebaseReady() {
+    isFirebaseReady = true;
+    if (syncCode) syncPullOnLoad();
+  }
+  if (window.__firestore) onFirebaseReady();
+  else window.addEventListener('firebase-ready', onFirebaseReady, { once: true });
+}
+init();
+
+</script>
+</body>
+</html>
