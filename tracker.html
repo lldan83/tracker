@@ -1,0 +1,1370 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>공부 트래커</title>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+KR:wght@400;500;700&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+  html, body {
+    height: 100%;
+    overscroll-behavior: none;
+  }
+
+  body {
+    font-family: 'Inter', 'Noto Sans KR', sans-serif;
+    background: #FAFAF9;
+    color: #1C1C1A;
+    max-width: 480px;
+    margin: 0 auto;
+    position: relative;
+  }
+
+  button, input, select {
+    font-family: inherit;
+  }
+
+  /* ===== 공통 ===== */
+  .screen {
+    min-height: 100vh;
+    padding-bottom: 40px;
+  }
+
+  .status-bar { height: 24px; }
+
+  .header {
+    padding: 8px 20px 20px;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .header h1 { font-size: 22px; font-weight: 700; letter-spacing: -0.02em; }
+
+  .header-actions { display: flex; gap: 8px; }
+
+  .icon-btn {
+    width: 36px; height: 36px; border-radius: 50%;
+    background: #1C1C1A; color: #FAFAF9;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; border: none; cursor: pointer;
+  }
+  .icon-btn.secondary {
+    background: #fff; color: #1C1C1A; border: 1px solid #E8E7E3;
+  }
+
+  .today-label { padding: 0 20px 8px; font-size: 13px; color: #8A8A85; }
+
+  .empty-state {
+    margin: 60px 20px; text-align: center; color: #ABABA6; font-size: 14px;
+  }
+  .empty-state button {
+    margin-top: 16px; padding: 10px 20px; border-radius: 100px;
+    background: #1C1C1A; color: #fff; border: none; font-size: 14px; font-weight: 600;
+  }
+
+  .subject-section { padding: 20px 20px 4px; }
+  .subject-title-row {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 10px;
+  }
+  .subject-title { font-size: 15px; font-weight: 700; color: #5A5A56; }
+  .subject-actions { display: flex; gap: 10px; }
+  .subject-actions button {
+    background: none; border: none; font-size: 12px; color: #ABABA6; padding: 4px;
+  }
+
+  .cards { display: flex; flex-direction: column; gap: 10px; }
+  .card {
+    border: 1px solid #E8E7E3; border-radius: 16px; padding: 16px;
+    display: flex; align-items: center; gap: 14px; background: #fff;
+    cursor: pointer;
+  }
+  .ring { position: relative; width: 48px; height: 48px; flex-shrink: 0; }
+  .ring svg { transform: rotate(-90deg); }
+  .ring-bg { fill: none; stroke: #EFEFEC; stroke-width: 4.5; }
+  .ring-fg { fill: none; stroke-width: 4.5; stroke-linecap: round; transition: stroke-dashoffset 0.3s; }
+  .ring-pct {
+    position: absolute; inset: 0; display: flex;
+    align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 700;
+  }
+  .card-body { flex: 1; min-width: 0; }
+  .card-title { font-size: 15px; font-weight: 600; margin-bottom: 3px; }
+  .card-sub { font-size: 12px; color: #8A8A85; }
+  .card-sub .pct { color: #C4C4BE; }
+  .card-today { text-align: right; flex-shrink: 0; }
+  .card-today .label { font-size: 10px; color: #ABABA6; margin-bottom: 2px; }
+  .card-today .value { font-size: 16px; font-weight: 700; letter-spacing: -0.01em; }
+  .card-today .value.overdue { color: #C97B63; }
+  .dday { font-size: 10px; color: #ABABA6; margin-top: 2px; }
+
+  .divider { height: 1px; background: #F0EFEB; margin: 4px 20px 0; }
+
+  /* ===== 상세 화면 ===== */
+  .nav {
+    padding: 8px 20px 4px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .nav-left { display: flex; align-items: center; gap: 12px; }
+  .nav .back { font-size: 22px; color: #8A8A85; background: none; border: none; cursor: pointer; padding: 4px; }
+  .nav .subject { font-size: 17px; font-weight: 700; }
+  .nav .edit-btn {
+    font-size: 13px; color: #6B84A0; background: none; border: none; cursor: pointer;
+    padding: 6px 10px; font-weight: 600;
+  }
+
+  .hero {
+    padding: 20px 20px 8px;
+    display: flex; flex-direction: column; align-items: center;
+  }
+  .big-ring { position: relative; width: 200px; height: 200px; margin-bottom: 16px; }
+  .big-ring svg { transform: rotate(-90deg); }
+  .big-ring-bg { fill: none; stroke: #EFEFEC; stroke-width: 9; }
+  .big-ring-fg { fill: none; stroke-width: 9; stroke-linecap: round; transition: stroke-dashoffset 0.3s; }
+  .big-ring-center {
+    position: absolute; inset: 0;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+  }
+  .big-ring-center .today-value { font-size: 36px; font-weight: 800; letter-spacing: -0.03em; line-height: 1; }
+  .big-ring-center .today-unit { font-size: 12px; color: #8A8A85; margin-top: 6px; text-align: center; }
+
+  .range-note {
+    font-size: 14px; color: #5A5A56; background: #F0EFEB;
+    padding: 6px 14px; border-radius: 100px; margin-bottom: 4px;
+  }
+
+  .stats-row { display: flex; padding: 20px; gap: 8px; }
+  .stat {
+    flex: 1; min-width: 0; border: 1px solid #E8E7E3; border-radius: 14px;
+    padding: 12px 10px; background: #fff;
+  }
+  .stat .label { font-size: 11px; color: #ABABA6; margin-bottom: 4px; white-space: nowrap; }
+  .stat .value {
+    font-size: 15px; font-weight: 700; white-space: nowrap;
+    overflow: hidden; text-overflow: ellipsis;
+  }
+  .stat .value.overdue { color: #C97B63; }
+
+  .section-title { padding: 8px 20px 10px; font-size: 13px; font-weight: 600; color: #8A8A85; }
+
+  .log-input {
+    margin: 0 20px 20px; border: 1px solid #E8E7E3; border-radius: 14px;
+    padding: 16px; background: #fff; display: flex; align-items: center; justify-content: space-between;
+  }
+  .log-input .log-label { font-size: 14px; color: #5A5A56; }
+  .stepper { display: flex; align-items: center; gap: 14px; }
+  .stepper button {
+    width: 32px; height: 32px; border-radius: 50%; border: 1px solid #DEDEDA;
+    background: #FAFAF9; font-size: 18px; color: #1C1C1A; cursor: pointer;
+  }
+  .stepper .num { font-size: 18px; font-weight: 700; min-width: 30px; text-align: center; }
+
+  .log-input.log-input-select { flex-direction: column; align-items: stretch; gap: 10px; }
+  .log-input-select select {
+    width: 100%; padding: 12px 14px; border-radius: 12px; border: 1px solid #E0DFDB;
+    font-size: 14px; background: #FAFAF9; color: #1C1C1A;
+  }
+  .log-input-select select:focus { outline: none; border-color: #6B84A0; }
+
+  .history { padding: 0 20px 20px; display: flex; flex-direction: column; }
+  .history-row {
+    display: flex; justify-content: space-between; padding: 12px 4px;
+    border-bottom: 1px solid #F0EFEB; font-size: 14px; cursor: pointer;
+  }
+  .history-row .date { color: #8A8A85; }
+  .history-row .done { font-weight: 600; }
+  .history-row .empty { color: #C4C4BE; font-weight: 400; }
+
+  .danger-zone { padding: 20px; }
+  .danger-btn {
+    width: 100%; padding: 14px; border-radius: 14px; border: 1px solid #F0DCD5;
+    background: #fff; color: #C97B63; font-size: 14px; font-weight: 600; cursor: pointer;
+  }
+
+  /* ===== 모달 ===== */
+  .modal-overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.35);
+    display: flex; align-items: flex-end; justify-content: center;
+    z-index: 100;
+  }
+  .modal-overlay.hidden { display: none; }
+  .modal {
+    background: #FAFAF9; width: 100%; max-width: 480px;
+    border-radius: 24px 24px 0 0; padding: 24px 20px 32px;
+    max-height: 85vh; overflow-y: auto;
+  }
+  .modal-title { font-size: 18px; font-weight: 700; margin-bottom: 20px; }
+
+  .field { margin-bottom: 16px; }
+  .field label { display: block; font-size: 13px; color: #8A8A85; margin-bottom: 6px; }
+  .field input, .field select {
+    width: 100%; padding: 12px 14px; border-radius: 12px; border: 1px solid #E0DFDB;
+    font-size: 15px; background: #fff; color: #1C1C1A;
+  }
+  .field input:focus, .field select:focus { outline: none; border-color: #6B84A0; }
+
+  .type-toggle { display: flex; gap: 8px; }
+  .type-toggle button {
+    flex: 1; padding: 12px; border-radius: 12px; border: 1px solid #E0DFDB;
+    background: #fff; font-size: 14px; color: #8A8A85; cursor: pointer;
+  }
+  .type-toggle button.active { background: #1C1C1A; color: #fff; border-color: #1C1C1A; }
+
+  .subject-pick { display: flex; flex-direction: column; gap: 8px; }
+  .subject-pick button {
+    padding: 14px; border-radius: 12px; border: 1px solid #E0DFDB; background: #fff;
+    font-size: 15px; text-align: left; cursor: pointer;
+  }
+  .subject-pick button.active { border-color: #1C1C1A; background: #F0EFEB; font-weight: 600; }
+
+  .modal-actions { display: flex; gap: 10px; margin-top: 24px; }
+  .modal-actions button {
+    flex: 1; padding: 14px; border-radius: 100px; font-size: 15px; font-weight: 600; cursor: pointer; border: none;
+  }
+  .btn-cancel { background: #F0EFEB; color: #5A5A56; }
+  .btn-confirm { background: #1C1C1A; color: #fff; }
+  .btn-confirm:disabled { background: #D8D7D2; }
+
+  .row-2 { display: flex; gap: 10px; }
+  .row-2 .field { flex: 1; }
+
+  .hint { font-size: 12px; color: #ABABA6; margin-top: -8px; margin-bottom: 16px; }
+
+  .hidden { display: none !important; }
+
+  .chapter-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 8px; }
+  .chapter-row { display: flex; align-items: center; gap: 8px; }
+  .chapter-row .chapter-num { font-size: 12px; color: #ABABA6; width: 20px; flex-shrink: 0; text-align: right; }
+  .chapter-row input {
+    flex: 1; padding: 10px 12px; border-radius: 10px; border: 1px solid #E0DFDB;
+    font-size: 14px; background: #fff; min-width: 0;
+  }
+  .chapter-row input:focus { outline: none; border-color: #6B84A0; }
+  .chapter-row .remove-chapter {
+    color: #C4C4BE; font-size: 18px; padding: 4px 6px; background: none; border: none; flex-shrink: 0;
+  }
+  .add-unit-btn {
+    width: 100%; padding: 10px; border-radius: 12px; border: 1px dashed #D8D7D2;
+    background: none; color: #8A8A85; font-size: 13px; margin-top: 4px; cursor: pointer;
+  }
+  .total-preview {
+    margin-top: 14px; background: #F0EFEB; border-radius: 12px; padding: 12px 16px;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .total-preview .label { font-size: 13px; color: #5A5A56; }
+  .total-preview .value { font-size: 16px; font-weight: 700; }
+</style>
+</head>
+<body>
+
+<div id="app"></div>
+
+<!-- ===== 모달들 ===== -->
+<div class="modal-overlay hidden" id="modal-add-subject">
+  <div class="modal">
+    <div class="modal-title">과목 추가</div>
+    <div class="field">
+      <label>과목명</label>
+      <input type="text" id="input-subject-name" placeholder="예: 한국사">
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal('modal-add-subject')">취소</button>
+      <button class="btn-confirm" onclick="submitAddSubject()">추가</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay hidden" id="modal-add-item">
+  <div class="modal">
+    <div class="modal-title">항목 추가</div>
+
+    <div class="field">
+      <label>과목</label>
+      <div class="subject-pick" id="subject-pick-list"></div>
+    </div>
+
+    <div class="field">
+      <label>항목명</label>
+      <input type="text" id="input-item-name" placeholder="예: 인강, 기출문제집">
+    </div>
+
+    <div class="field">
+      <label>유형</label>
+      <div class="type-toggle">
+        <button id="type-count" class="active" onclick="setItemType('count')">수량형</button>
+        <button id="type-chapter" onclick="setItemType('chapter')">목차형</button>
+      </div>
+    </div>
+    <div class="hint" id="type-hint">순서 없는 총량 (예: 단어 317개)</div>
+
+    <div class="field" id="count-target-field">
+      <label id="target-label">총 목표량</label>
+      <input type="number" id="input-target" placeholder="예: 70" min="1">
+    </div>
+
+    <div class="field hidden" id="chapter-list-field">
+      <label>목차 (순서대로 입력)</label>
+      <div class="chapter-list" id="chapter-list"></div>
+      <button type="button" class="add-unit-btn" onclick="addChapterRow()">+ 항목 추가</button>
+      <div class="total-preview">
+        <span class="label">총 목표량 (자동 계산)</span>
+        <span class="value" id="chapter-total-preview">0개</span>
+      </div>
+      <div class="field" style="margin-top:14px;">
+        <label>이미 완료한 지점 (없으면 처음부터)</label>
+        <select id="input-initial-progress"><option value="">처음부터 (아직 시작 안함)</option></select>
+      </div>
+    </div>
+
+    <div class="row-2">
+      <div class="field">
+        <label>시작일</label>
+        <input type="date" id="input-start-date">
+      </div>
+      <div class="field">
+        <label>목표일</label>
+        <input type="date" id="input-end-date">
+      </div>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal('modal-add-item')">취소</button>
+      <button class="btn-confirm" onclick="submitAddItem()">추가</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay hidden" id="modal-edit-log">
+  <div class="modal">
+    <div class="modal-title" id="edit-log-title">기록 수정</div>
+    <div class="field" id="edit-log-number-field">
+      <label id="edit-log-label">그 날짜까지 완료한 양</label>
+      <input type="number" id="input-edit-log-value" min="0">
+    </div>
+    <div class="field hidden" id="edit-log-select-field">
+      <label>그 날짜까지 완료한 목차</label>
+      <select id="input-edit-log-select"></select>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal('modal-edit-log')">취소</button>
+      <button class="btn-confirm" onclick="submitEditLog()">저장</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay hidden" id="modal-confirm-delete">
+  <div class="modal">
+    <div class="modal-title" id="confirm-delete-text">삭제하시겠습니까?</div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal('modal-confirm-delete')">취소</button>
+      <button class="btn-confirm" style="background:#C97B63" onclick="confirmDelete()">삭제</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay hidden" id="modal-edit-item">
+  <div class="modal">
+    <div class="modal-title">항목 수정</div>
+
+    <div class="field">
+      <label>항목명</label>
+      <input type="text" id="edit-input-item-name">
+    </div>
+
+    <div class="field" id="edit-count-target-field">
+      <label>총 목표량</label>
+      <input type="number" id="edit-input-target" min="1">
+    </div>
+
+    <div class="field hidden" id="edit-chapter-list-field">
+      <label>목차 (이름 수정 · 삭제 · 추가 가능)</label>
+      <div class="chapter-list" id="edit-chapter-list"></div>
+      <button type="button" class="add-unit-btn" onclick="addEditChapterRow()">+ 목차 추가</button>
+      <div class="total-preview">
+        <span class="label">총 목표량 (자동 계산)</span>
+        <span class="value" id="edit-chapter-total-preview">0개</span>
+      </div>
+      <div class="hint" style="margin-top:8px;">이미 완료 표시된 목차를 삭제해도 진행률은 안전하게 유지돼요</div>
+    </div>
+
+    <div class="row-2">
+      <div class="field">
+        <label>시작일</label>
+        <input type="date" id="edit-input-start-date">
+      </div>
+      <div class="field">
+        <label>목표일</label>
+        <input type="date" id="edit-input-end-date">
+      </div>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal('modal-edit-item')">취소</button>
+      <button class="btn-confirm" onclick="submitEditItem()">저장</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* =========================================================
+   상태 (일단 메모리 내 상태로 관리, 이후 Firebase 연결 예정)
+   ========================================================= */
+
+const COLORS = ['#6B84A0', '#B08968', '#7A8B7A', '#C97B63', '#8B7BA0'];
+
+let state = {
+  subjects: [],   // { id, name }
+  items: [],      // { id, subjectId, name, type, target, startDate, endDate, logs: {date: cumulativeValue} }
+};
+
+let nav = { screen: 'list', itemId: null };
+let pendingItemType = 'count';
+let pendingChapterList = ['', ''];
+let pendingSubjectIdForItem = null;
+let pendingDeleteAction = null;
+let editingLogDate = null;
+let editingLogItemId = null;
+let editingItemId = null;
+let editingChapterList = []; // [{id: 기존id 또는 null(신규), name}]
+
+/* ---------- 시드 데이터 (목업과 동일한 예시) ---------- */
+function seed() {
+  const s1 = uid(); const s2 = uid(); const s3 = uid();
+  state.subjects = [
+    { id: s1, name: '한국사' },
+    { id: s2, name: '영단어' },
+    { id: s3, name: '수학' },
+  ];
+  const koreanHistoryChapters = Array.from({ length: 70 }, (_, i) => ({ id: uid(), name: `${i + 1}강` }));
+  const mathChapters = Array.from({ length: 45 }, (_, i) => ({ id: uid(), name: `${i + 1}강` }));
+  state.items = [
+    {
+      id: uid(), subjectId: s1, name: '인강', type: 'chapter', target: 70,
+      startDate: '2026-09-01', endDate: '2026-10-04',
+      logs: {
+        '2026-09-07': { id: koreanHistoryChapters[34].id, n: 35 },
+        '2026-09-09': { id: koreanHistoryChapters[37].id, n: 38 }
+      },
+      color: COLORS[0],
+      chapters: koreanHistoryChapters
+    },
+    {
+      id: uid(), subjectId: s1, name: '기출문제집', type: 'count', target: 200,
+      startDate: '2026-09-01', endDate: '2026-10-04',
+      logs: { '2026-09-09': 80 }, color: COLORS[1]
+    },
+    {
+      id: uid(), subjectId: s2, name: '단어 암기', type: 'count', target: 317,
+      startDate: '2026-09-01', endDate: '2026-09-19',
+      logs: { '2026-09-09': 210 }, color: COLORS[0]
+    },
+    {
+      id: uid(), subjectId: s3, name: '개념원리', type: 'chapter', target: 45,
+      startDate: '2026-09-10', endDate: '2026-10-10',
+      logs: {}, color: COLORS[0],
+      chapters: mathChapters
+    },
+  ];
+}
+
+function uid() { return Math.random().toString(36).slice(2, 10); }
+
+/* =========================================================
+   날짜 / 계산 로직
+   ========================================================= */
+
+function todayStr() {
+  return toDateStr(new Date());
+}
+
+function toDateStr(d) {
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${y}-${m}-${day}`;
+}
+
+function daysBetween(startStr, endStr) {
+  const start = new Date(startStr + 'T00:00:00');
+  const end = new Date(endStr + 'T00:00:00');
+  return Math.round((end - start) / 86400000);
+}
+
+function addDaysStr(dateStr, n) {
+  const d = new Date(dateStr + 'T00:00:00');
+  d.setDate(d.getDate() + n);
+  return toDateStr(d);
+}
+
+// 목차형 로그값({id, n})을 "현재 목차 목록 기준" 누적 숫자로 변환.
+// id로 먼저 찾고(순서가 바뀌거나 중간에 새 항목이 끼어도 안전),
+// 그 항목이 삭제되어 못 찾으면 기록 당시 저장해둔 숫자(n)로 대체.
+function resolveLogNumeric(item, rawValue) {
+  if (item.type !== 'chapter') return rawValue || 0;
+  if (rawValue == null) return 0;
+  if (typeof rawValue === 'number') return rawValue; // 이전 버전 데이터 호환
+  const idx = (item.chapters || []).findIndex(c => c.id === rawValue.id);
+  if (idx >= 0) return idx + 1;
+  return Math.min(rawValue.n || 0, (item.chapters || []).length);
+}
+
+function getCumulativeAt(item, dateStr) {
+  const logs = item.logs;
+  const dates = Object.keys(logs).filter(d => d <= dateStr).sort();
+  if (dates.length === 0) return 0;
+  return resolveLogNumeric(item, logs[dates[dates.length - 1]]);
+}
+
+function calcTodayGoal(item, today) {
+  const yesterday = addDaysStr(today, -1);
+  const cumulativeYesterday = getCumulativeAt(item, yesterday);
+  const remaining = Math.max(0, item.target - cumulativeYesterday);
+
+  let daysLeft = daysBetween(today, item.endDate) + 1;
+  const isOverdue = daysLeft < 1;
+  if (daysLeft < 1) daysLeft = 1;
+
+  const rawGoal = remaining / daysLeft;
+  const todayGoal = Math.ceil(rawGoal);
+
+  return { todayGoal, cumulativeYesterday, remaining, daysLeft, isOverdue };
+}
+
+function calcOverallProgress(item, today) {
+  const cum = getCumulativeAt(item, today);
+  const pct = item.target > 0 ? Math.round((cum / item.target) * 100) : 0;
+  return { cumulative: cum, pct: Math.min(pct, 100) };
+}
+
+function calcTodayProgressRing(item, today) {
+  const goalInfo = calcTodayGoal(item, today);
+  const cumToday = getCumulativeAt(item, today);
+  const cumYesterday = goalInfo.cumulativeYesterday;
+  const doneToday = Math.max(0, cumToday - cumYesterday);
+  let pct;
+  if (goalInfo.todayGoal <= 0) {
+    pct = cumToday >= item.target ? 100 : 0;
+  } else {
+    pct = Math.round((doneToday / goalInfo.todayGoal) * 100);
+  }
+  return Math.min(pct, 100);
+}
+
+function ddayLabel(endDate, today) {
+  const diff = daysBetween(today, endDate);
+  if (diff > 0) return `D-${diff}`;
+  if (diff === 0) return 'D-day';
+  return `D+${Math.abs(diff)}`;
+}
+
+/* =========================================================
+   렌더링
+   ========================================================= */
+
+function render() {
+  const app = document.getElementById('app');
+  if (nav.screen === 'list') {
+    app.innerHTML = renderListScreen();
+  } else if (nav.screen === 'detail') {
+    app.innerHTML = renderDetailScreen(nav.itemId);
+  }
+  updateSaveIndicator();
+}
+
+function renderListScreen() {
+  const today = todayStr();
+
+  if (state.items.length === 0 && state.subjects.length === 0) {
+    return `
+      <div class="screen">
+        <div class="status-bar"></div>
+        <div class="header">
+          <h1>공부 트래커</h1>
+          <div class="header-actions">
+            <button class="icon-btn secondary" onclick="openAddSubjectModal()">+ 과목</button>
+          </div>
+        </div>
+        <div class="empty-state">
+          아직 과목이 없어요.<br>먼저 과목을 추가해보세요.
+          <br>
+          <button onclick="openAddSubjectModal()">과목 추가</button>
+        </div>
+      </div>
+    `;
+  }
+
+  let sectionsHtml = '';
+  state.subjects.forEach(subj => {
+    const items = state.items.filter(i => i.subjectId === subj.id);
+    let cardsHtml = '';
+    if (items.length === 0) {
+      cardsHtml = `<div style="font-size:13px;color:#C4C4BE;padding:4px 0 8px;">항목이 없어요</div>`;
+    } else {
+      items.forEach((item) => {
+        cardsHtml += renderItemCard(item, today);
+      });
+    }
+    sectionsHtml += `
+      <div class="subject-section">
+        <div class="subject-title-row">
+          <div class="subject-title">${escapeHtml(subj.name)}</div>
+          <div class="subject-actions">
+            <button onclick="openDeleteSubjectConfirm('${subj.id}')">삭제</button>
+          </div>
+        </div>
+        <div class="cards">${cardsHtml}</div>
+      </div>
+      <div class="divider"></div>
+    `;
+  });
+
+  return `
+    <div class="screen">
+      <div class="status-bar"></div>
+      <div class="header">
+        <h1>공부 트래커</h1>
+        <div class="header-actions">
+          <button class="icon-btn secondary" onclick="openAddSubjectModal()" title="과목 추가" style="font-size:13px;width:auto;padding:0 14px;">+ 과목</button>
+          <button class="icon-btn" onclick="openAddItemModal()" title="항목 추가" style="font-size:13px;width:auto;padding:0 14px;">+ 항목</button>
+        </div>
+      </div>
+      <div class="today-label">${formatTodayLabel(today)} <span id="save-indicator" style="font-size:11px;"></span></div>
+      ${sectionsHtml}
+    </div>
+  `;
+}
+
+function renderItemCard(item, today) {
+  const color = item.color || COLORS[0];
+  const overall = calcOverallProgress(item, today);
+  const goalInfo = calcTodayGoal(item, today);
+  const ringPct = calcTodayProgressRing(item, today);
+
+  const r = 20, circumference = 2 * Math.PI * r;
+  const offset = circumference - (ringPct / 100) * circumference;
+
+  let todayValueText;
+  if (overall.cumulative >= item.target) {
+    todayValueText = '완료';
+  } else {
+    todayValueText = `${goalInfo.todayGoal}개`;
+  }
+
+  const dday = ddayLabel(item.endDate, today);
+  const isOverdue = dday.startsWith('D+');
+
+  return `
+    <div class="card" onclick="openDetail('${item.id}')">
+      <div class="ring">
+        <svg width="48" height="48">
+          <circle class="ring-bg" cx="24" cy="24" r="${r}"></circle>
+          <circle class="ring-fg" cx="24" cy="24" r="${r}" stroke="${color}"
+            stroke-dasharray="${circumference.toFixed(1)}" stroke-dashoffset="${offset.toFixed(1)}"></circle>
+        </svg>
+        <div class="ring-pct">${ringPct}%</div>
+      </div>
+      <div class="card-body">
+        <div class="card-title">${escapeHtml(item.name)}</div>
+        <div class="card-sub">${overall.cumulative}개 / ${item.target}개 <span class="pct">· ${overall.pct}%</span></div>
+      </div>
+      <div class="card-today">
+        <div class="label">오늘</div>
+        <div class="value ${isOverdue ? 'overdue' : ''}">${todayValueText}</div>
+        <div class="dday">${dday}</div>
+      </div>
+    </div>
+  `;
+}
+
+function renderDetailScreen(itemId) {
+  const item = state.items.find(i => i.id === itemId);
+  if (!item) { nav.screen = 'list'; return renderListScreen(); }
+
+  const isChapter = item.type === 'chapter';
+  const subj = state.subjects.find(s => s.id === item.subjectId);
+  const today = todayStr();
+  const overall = calcOverallProgress(item, today);
+  const goalInfo = calcTodayGoal(item, today);
+  const ringPct = calcTodayProgressRing(item, today);
+
+  const r = 88, circumference = 2 * Math.PI * r;
+  const offset = circumference - (ringPct / 100) * circumference;
+  const itemColor = item.color || COLORS[0];
+
+  const isDone = overall.cumulative >= item.target;
+  let centerValue, centerUnit;
+  if (isDone) {
+    centerValue = '완료';
+    centerUnit = `총 ${item.target}개 달성`;
+  } else {
+    centerValue = `${goalInfo.todayGoal}개`;
+    centerUnit = `오늘 목표 · ${ringPct}% 완료`;
+  }
+
+  // 오늘 범위 표시 (목차형: 이름 기반)
+  let rangeNote = '';
+  if (!isDone && isChapter && item.chapters) {
+    const fromIdx = goalInfo.cumulativeYesterday; // 0-based, 다음에 봐야 할 첫 항목
+    const toIdx = goalInfo.cumulativeYesterday + goalInfo.todayGoal - 1; // 0-based, 오늘 목표의 마지막 항목
+    const fromChapter = item.chapters[fromIdx];
+    const toChapter = item.chapters[Math.min(toIdx, item.chapters.length - 1)];
+    const fromName = fromChapter ? fromChapter.name : '';
+    const toName = toChapter ? toChapter.name : '';
+    rangeNote = fromName === toName || toIdx <= fromIdx
+      ? `<div class="range-note">${escapeHtml(fromName)}</div>`
+      : `<div class="range-note">${escapeHtml(fromName)} ~ ${escapeHtml(toName)}</div>`;
+  }
+
+  const dday = ddayLabel(item.endDate, today);
+  const isOverdue = dday.startsWith('D+');
+
+  // 오늘 선택된 드롭다운 값(목차 id) 또는 오늘 로그값
+  let todayLogValue;
+  if (isChapter) {
+    const rawToday = item.logs[today];
+    if (rawToday !== undefined) {
+      todayLogValue = typeof rawToday === 'object' ? rawToday.id : (item.chapters[rawToday - 1] ? item.chapters[rawToday - 1].id : null);
+    } else {
+      const yIdx = goalInfo.cumulativeYesterday - 1;
+      todayLogValue = item.chapters[yIdx] ? item.chapters[yIdx].id : null;
+    }
+  } else {
+    todayLogValue = item.logs[today] !== undefined ? item.logs[today] : goalInfo.cumulativeYesterday;
+  }
+
+  const logDates = Object.keys(item.logs).sort().reverse().slice(0, 10);
+  let historyHtml = '';
+  if (logDates.length === 0) {
+    historyHtml = `<div style="padding:20px 4px;color:#C4C4BE;font-size:13px;">아직 기록이 없어요</div>`;
+  } else {
+    logDates.forEach((date) => {
+      const cum = resolveLogNumeric(item, item.logs[date]);
+      const prevDates = Object.keys(item.logs).filter(d => d < date).sort();
+      const prevCum = prevDates.length > 0 ? resolveLogNumeric(item, item.logs[prevDates[prevDates.length - 1]]) : 0;
+      let rangeText;
+      if (isChapter && item.chapters) {
+        if (prevCum + 1 <= cum) {
+          const fromChapter = item.chapters[prevCum];
+          const toChapter = item.chapters[cum - 1];
+          const fromName = fromChapter ? fromChapter.name : '';
+          const toName = toChapter ? toChapter.name : '';
+          rangeText = fromName === toName ? escapeHtml(fromName) : `${escapeHtml(fromName)} ~ ${escapeHtml(toName)}`;
+        } else {
+          const c = item.chapters[cum - 1];
+          rangeText = escapeHtml(c ? c.name : '');
+        }
+      } else {
+        const diff = cum - prevCum;
+        rangeText = `+${diff}개 (누적 ${cum}개)`;
+      }
+      historyHtml += `
+        <div class="history-row" onclick="openEditLog('${item.id}', '${date}')">
+          <span class="date">${formatDateShort(date)}</span>
+          <span class="done">${rangeText}</span>
+        </div>
+      `;
+    });
+  }
+
+  // 오늘 기록 입력: 목차형은 드롭다운, 수량형은 스테퍼
+  let logInputHtml;
+  if (isChapter && item.chapters) {
+    const cumYesterday = goalInfo.cumulativeYesterday;
+    const options = item.chapters.map((chapter, idx) => {
+      const posValue = idx + 1;
+      const disabled = posValue < cumYesterday ? 'disabled' : '';
+      const selected = chapter.id === todayLogValue ? 'selected' : '';
+      return `<option value="${escapeHtmlAttr(chapter.id)}" ${selected} ${disabled}>${escapeHtml(chapter.name)}</option>`;
+    }).join('');
+    logInputHtml = `
+      <div class="log-input log-input-select">
+        <span class="log-label">오늘까지 완료한 목차</span>
+        <select onchange="setChapterLog('${item.id}', this.value)">${options}</select>
+      </div>
+    `;
+  } else {
+    logInputHtml = `
+      <div class="log-input">
+        <span class="log-label">오늘까지 완료한 양</span>
+        <div class="stepper">
+          <button onclick="stepTodayLog('${item.id}', -1)">−</button>
+          <span class="num" id="today-log-num">${todayLogValue}</span>
+          <button onclick="stepTodayLog('${item.id}', 1)">+</button>
+        </div>
+      </div>
+    `;
+  }
+
+  return `
+    <div class="screen">
+      <div class="status-bar"></div>
+      <div class="nav">
+        <div class="nav-left">
+          <button class="back" onclick="goBack()">‹</button>
+          <span class="subject">${escapeHtml(item.name)}</span>
+        </div>
+        <button class="edit-btn" onclick="openEditItemModal('${item.id}')">수정</button>
+      </div>
+      <div style="padding:0 20px;font-size:12px;color:#ABABA6;">${escapeHtml(subj ? subj.name : '')}</div>
+
+      <div class="hero">
+        <div class="big-ring">
+          <svg width="200" height="200">
+            <circle class="big-ring-bg" cx="100" cy="100" r="${r}"></circle>
+            <circle class="big-ring-fg" cx="100" cy="100" r="${r}" stroke="${itemColor}"
+              stroke-dasharray="${circumference.toFixed(1)}" stroke-dashoffset="${offset.toFixed(1)}"></circle>
+          </svg>
+          <div class="big-ring-center">
+            <div class="today-value">${centerValue}</div>
+            <div class="today-unit">${centerUnit}</div>
+          </div>
+        </div>
+        ${rangeNote}
+      </div>
+
+      <div class="stats-row">
+        <div class="stat">
+          <div class="label">누적</div>
+          <div class="value">${overall.cumulative} / ${item.target}개</div>
+        </div>
+        <div class="stat">
+          <div class="label">목표일</div>
+          <div class="value">${formatDateShort(item.endDate)}</div>
+        </div>
+        <div class="stat">
+          <div class="label">남은 일수</div>
+          <div class="value ${isOverdue ? 'overdue' : ''}">${dday}</div>
+        </div>
+      </div>
+
+      <div class="section-title">오늘 기록</div>
+      ${logInputHtml}
+
+      <div class="section-title">최근 기록</div>
+      <div class="history">${historyHtml}</div>
+
+      <div class="danger-zone">
+        <button class="danger-btn" onclick="openDeleteItemConfirm('${item.id}')">이 항목 삭제</button>
+      </div>
+    </div>
+  `;
+}
+
+/* =========================================================
+   화면 전환
+   ========================================================= */
+
+function openDetail(itemId) {
+  nav = { screen: 'detail', itemId };
+  render();
+}
+
+function goBack() {
+  nav = { screen: 'list', itemId: null };
+  render();
+}
+
+/* =========================================================
+   오늘 기록 입력 (수량형: 스테퍼 / 목차형: 드롭다운)
+   ========================================================= */
+
+function setChapterLog(itemId, chapterId) {
+  const item = state.items.find(i => i.id === itemId);
+  if (!item) return;
+  const idx = (item.chapters || []).findIndex(c => c.id === chapterId);
+  if (idx < 0) return;
+  item.logs[todayStr()] = { id: chapterId, n: idx + 1 };
+  render();
+  saveState();
+}
+
+function stepTodayLog(itemId, delta) {
+  const item = state.items.find(i => i.id === itemId);
+  if (!item) return;
+  const today = todayStr();
+  const yesterday = addDaysStr(today, -1);
+  const cumYesterday = getCumulativeAt(item, yesterday);
+  const current = item.logs[today] !== undefined ? item.logs[today] : cumYesterday;
+  let next = current + delta;
+  if (next < cumYesterday) next = cumYesterday;
+  if (next > item.target) next = item.target;
+  item.logs[today] = next;
+  render();
+  saveState();
+}
+
+/* =========================================================
+   모달: 과목 추가
+   ========================================================= */
+
+function openAddSubjectModal() {
+  document.getElementById('input-subject-name').value = '';
+  showModal('modal-add-subject');
+}
+
+function submitAddSubject() {
+  const name = document.getElementById('input-subject-name').value.trim();
+  if (!name) { alert('과목명을 입력해주세요.'); return; }
+  state.subjects.push({ id: uid(), name });
+  closeModal('modal-add-subject');
+  render();
+  saveState();
+}
+
+/* =========================================================
+   모달: 항목 추가
+   ========================================================= */
+
+function openAddItemModal() {
+  if (state.subjects.length === 0) {
+    alert('먼저 과목을 추가해주세요.');
+    openAddSubjectModal();
+    return;
+  }
+  pendingItemType = 'count';
+  document.getElementById('type-count').classList.add('active');
+  document.getElementById('type-chapter').classList.remove('active');
+  document.getElementById('type-hint').textContent = '순서 없는 총량 (예: 단어 317개)';
+  document.getElementById('count-target-field').classList.remove('hidden');
+  document.getElementById('chapter-list-field').classList.add('hidden');
+  document.getElementById('input-item-name').value = '';
+  document.getElementById('input-target').value = '';
+  document.getElementById('input-start-date').value = todayStr();
+  document.getElementById('input-end-date').value = '';
+
+  pendingChapterList = ['', ''];
+  renderChapterListInputs();
+
+  pendingSubjectIdForItem = state.subjects[0].id;
+  const pickList = document.getElementById('subject-pick-list');
+  pickList.innerHTML = state.subjects.map(s => `
+    <button class="${s.id === pendingSubjectIdForItem ? 'active' : ''}" onclick="pickSubjectForItem('${s.id}')" id="pick-${s.id}">${escapeHtml(s.name)}</button>
+  `).join('');
+
+  showModal('modal-add-item');
+}
+
+function pickSubjectForItem(subjectId) {
+  pendingSubjectIdForItem = subjectId;
+  state.subjects.forEach(s => {
+    document.getElementById(`pick-${s.id}`).classList.toggle('active', s.id === subjectId);
+  });
+}
+
+function setItemType(type) {
+  pendingItemType = type;
+  document.getElementById('type-count').classList.toggle('active', type === 'count');
+  document.getElementById('type-chapter').classList.toggle('active', type === 'chapter');
+  document.getElementById('type-hint').textContent = type === 'chapter'
+    ? '순서 있는 목차 항목을 순서대로 입력하세요'
+    : '순서 없는 총량 (예: 단어 317개)';
+  document.getElementById('count-target-field').classList.toggle('hidden', type === 'chapter');
+  document.getElementById('chapter-list-field').classList.toggle('hidden', type !== 'chapter');
+}
+
+/* ---------- 목차형 목록 입력 ---------- */
+
+function renderChapterListInputs() {
+  const container = document.getElementById('chapter-list');
+  container.innerHTML = pendingChapterList.map((val, idx) => `
+    <div class="chapter-row">
+      <span class="chapter-num">${idx + 1}</span>
+      <input type="text" value="${escapeHtmlAttr(val)}" placeholder="예: 1-01. 정수"
+        oninput="updateChapterValue(${idx}, this.value)">
+      <button type="button" class="remove-chapter" onclick="removeChapterRow(${idx})">×</button>
+    </div>
+  `).join('');
+  updateChapterTotalPreview();
+}
+
+function updateChapterValue(idx, value) {
+  pendingChapterList[idx] = value;
+  updateChapterTotalPreview();
+}
+
+function addChapterRow() {
+  pendingChapterList.push('');
+  renderChapterListInputs();
+}
+
+function removeChapterRow(idx) {
+  if (pendingChapterList.length <= 1) return;
+  pendingChapterList.splice(idx, 1);
+  renderChapterListInputs();
+}
+
+function updateChapterTotalPreview() {
+  const names = pendingChapterList.map(v => v.trim()).filter(v => v !== '');
+  document.getElementById('chapter-total-preview').textContent = `${names.length}개`;
+
+  const progressSelect = document.getElementById('input-initial-progress');
+  const prevValue = progressSelect.value;
+  progressSelect.innerHTML = '<option value="">처음부터 (아직 시작 안함)</option>' +
+    names.map((name, idx) => `<option value="${idx}">${escapeHtml(name)}</option>`).join('');
+  if (prevValue && parseInt(prevValue, 10) < names.length) progressSelect.value = prevValue;
+}
+
+function submitAddItem() {
+  const name = document.getElementById('input-item-name').value.trim();
+  const startDate = document.getElementById('input-start-date').value;
+  const endDate = document.getElementById('input-end-date').value;
+
+  if (!name) { alert('항목명을 입력해주세요.'); return; }
+  if (!startDate || !endDate) { alert('시작일과 목표일을 입력해주세요.'); return; }
+  if (endDate < startDate) { alert('목표일이 시작일보다 빠를 수 없어요.'); return; }
+
+  let target, chapters;
+  if (pendingItemType === 'chapter') {
+    const names = pendingChapterList.map(v => v.trim()).filter(v => v !== '');
+    if (names.length === 0) { alert('목차를 하나 이상 입력해주세요.'); return; }
+    chapters = names.map(n => ({ id: uid(), name: n }));
+    target = chapters.length;
+  } else {
+    target = parseInt(document.getElementById('input-target').value, 10);
+    if (!target || target <= 0) { alert('목표량을 입력해주세요.'); return; }
+  }
+
+  const existingCountInSubject = state.items.filter(i => i.subjectId === pendingSubjectIdForItem).length;
+  const color = COLORS[existingCountInSubject % COLORS.length];
+
+  const newItem = {
+    id: uid(), subjectId: pendingSubjectIdForItem, name, type: pendingItemType,
+    target, startDate, endDate, logs: {}, color
+  };
+  if (pendingItemType === 'chapter') {
+    newItem.chapters = chapters;
+    const initialIdx = document.getElementById('input-initial-progress').value;
+    if (initialIdx !== '') {
+      const idx = parseInt(initialIdx, 10);
+      newItem.logs[startDate] = { id: chapters[idx].id, n: idx + 1 };
+    }
+  }
+
+  state.items.push(newItem);
+  closeModal('modal-add-item');
+  render();
+  saveState();
+}
+
+/* =========================================================
+   모달: 과거 기록 수정
+   ========================================================= */
+
+function openEditLog(itemId, date) {
+  const item = state.items.find(i => i.id === itemId);
+  if (!item) return;
+  editingLogItemId = itemId;
+  editingLogDate = date;
+  document.getElementById('edit-log-title').textContent = `${formatDateShort(date)} 기록 수정`;
+
+  if (item.type === 'chapter' && item.chapters) {
+    document.getElementById('edit-log-number-field').classList.add('hidden');
+    document.getElementById('edit-log-select-field').classList.remove('hidden');
+    const select = document.getElementById('input-edit-log-select');
+    const rawVal = item.logs[date];
+    const currentId = rawVal && typeof rawVal === 'object' ? rawVal.id : null;
+    select.innerHTML = item.chapters.map((chapter) => {
+      const selected = chapter.id === currentId ? 'selected' : '';
+      return `<option value="${escapeHtmlAttr(chapter.id)}" ${selected}>${escapeHtml(chapter.name)}</option>`;
+    }).join('');
+  } else {
+    document.getElementById('edit-log-number-field').classList.remove('hidden');
+    document.getElementById('edit-log-select-field').classList.add('hidden');
+    document.getElementById('edit-log-label').textContent = '그날까지 완료한 양';
+    document.getElementById('input-edit-log-value').value = item.logs[date];
+  }
+
+  showModal('modal-edit-log');
+}
+
+function submitEditLog() {
+  const item = state.items.find(i => i.id === editingLogItemId);
+  if (!item) return;
+
+  if (item.type === 'chapter' && item.chapters) {
+    const chapterId = document.getElementById('input-edit-log-select').value;
+    const idx = item.chapters.findIndex(c => c.id === chapterId);
+    if (idx < 0) return;
+    item.logs[editingLogDate] = { id: chapterId, n: idx + 1 };
+  } else {
+    const val = parseInt(document.getElementById('input-edit-log-value').value, 10);
+    if (isNaN(val) || val < 0) { alert('올바른 값을 입력해주세요.'); return; }
+    item.logs[editingLogDate] = val;
+  }
+
+  closeModal('modal-edit-log');
+  render();
+  saveState();
+}
+
+/* =========================================================
+   삭제 확인
+   ========================================================= */
+
+function openDeleteSubjectConfirm(subjectId) {
+  const subj = state.subjects.find(s => s.id === subjectId);
+  document.getElementById('confirm-delete-text').textContent = `'${subj.name}' 과목과 그 안의 모든 항목을 삭제할까요?`;
+  pendingDeleteAction = () => {
+    state.items = state.items.filter(i => i.subjectId !== subjectId);
+    state.subjects = state.subjects.filter(s => s.id !== subjectId);
+  };
+  showModal('modal-confirm-delete');
+}
+
+function openDeleteItemConfirm(itemId) {
+  const item = state.items.find(i => i.id === itemId);
+  document.getElementById('confirm-delete-text').textContent = `'${item.name}' 항목을 삭제할까요?`;
+  pendingDeleteAction = () => {
+    state.items = state.items.filter(i => i.id !== itemId);
+    nav = { screen: 'list', itemId: null };
+  };
+  showModal('modal-confirm-delete');
+}
+
+function confirmDelete() {
+  if (pendingDeleteAction) pendingDeleteAction();
+  pendingDeleteAction = null;
+  closeModal('modal-confirm-delete');
+  render();
+  saveState();
+}
+
+/* =========================================================
+   모달: 항목 수정
+   ========================================================= */
+
+function openEditItemModal(itemId) {
+  const item = state.items.find(i => i.id === itemId);
+  if (!item) return;
+  editingItemId = itemId;
+
+  document.getElementById('edit-input-item-name').value = item.name;
+  document.getElementById('edit-input-start-date').value = item.startDate;
+  document.getElementById('edit-input-end-date').value = item.endDate;
+
+  if (item.type === 'chapter') {
+    document.getElementById('edit-count-target-field').classList.add('hidden');
+    document.getElementById('edit-chapter-list-field').classList.remove('hidden');
+    editingChapterList = (item.chapters || []).map(c => ({ id: c.id, name: c.name }));
+    renderEditChapterListInputs();
+  } else {
+    document.getElementById('edit-count-target-field').classList.remove('hidden');
+    document.getElementById('edit-chapter-list-field').classList.add('hidden');
+    document.getElementById('edit-input-target').value = item.target;
+  }
+
+  showModal('modal-edit-item');
+}
+
+function renderEditChapterListInputs() {
+  const container = document.getElementById('edit-chapter-list');
+  container.innerHTML = editingChapterList.map((c, idx) => `
+    <div class="chapter-row">
+      <span class="chapter-num">${idx + 1}</span>
+      <input type="text" value="${escapeHtmlAttr(c.name)}" placeholder="예: 1-01. 정수"
+        oninput="updateEditChapterValue(${idx}, this.value)">
+      <button type="button" class="remove-chapter" onclick="removeEditChapterRow(${idx})">×</button>
+    </div>
+  `).join('');
+  updateEditChapterTotalPreview();
+}
+
+function updateEditChapterValue(idx, value) {
+  editingChapterList[idx].name = value;
+  updateEditChapterTotalPreview();
+}
+
+function addEditChapterRow() {
+  editingChapterList.push({ id: null, name: '' });
+  renderEditChapterListInputs();
+}
+
+function removeEditChapterRow(idx) {
+  if (editingChapterList.length <= 1) return;
+  editingChapterList.splice(idx, 1);
+  renderEditChapterListInputs();
+}
+
+function updateEditChapterTotalPreview() {
+  const count = editingChapterList.filter(c => c.name.trim() !== '').length;
+  document.getElementById('edit-chapter-total-preview').textContent = `${count}개`;
+}
+
+function submitEditItem() {
+  const item = state.items.find(i => i.id === editingItemId);
+  if (!item) return;
+
+  const name = document.getElementById('edit-input-item-name').value.trim();
+  const startDate = document.getElementById('edit-input-start-date').value;
+  const endDate = document.getElementById('edit-input-end-date').value;
+
+  if (!name) { alert('항목명을 입력해주세요.'); return; }
+  if (!startDate || !endDate) { alert('시작일과 목표일을 입력해주세요.'); return; }
+  if (endDate < startDate) { alert('목표일이 시작일보다 빠를 수 없어요.'); return; }
+
+  item.name = name;
+  item.startDate = startDate;
+  item.endDate = endDate;
+
+  if (item.type === 'chapter') {
+    const cleaned = editingChapterList
+      .filter(c => c.name.trim() !== '')
+      .map(c => ({ id: c.id || uid(), name: c.name.trim() }));
+    if (cleaned.length === 0) { alert('목차를 하나 이상 입력해주세요.'); return; }
+    // 삭제된 목차를 가리키던 기록은 resolveLogNumeric의 스냅샷(n) 대체 로직이 안전하게 처리함
+    item.chapters = cleaned;
+    item.target = cleaned.length;
+  } else {
+    const target = parseInt(document.getElementById('edit-input-target').value, 10);
+    if (!target || target <= 0) { alert('목표량을 입력해주세요.'); return; }
+    item.target = target;
+  }
+
+  closeModal('modal-edit-item');
+  render();
+  saveState();
+}
+
+/* =========================================================
+   유틸
+   ========================================================= */
+
+function showModal(id) { document.getElementById(id).classList.remove('hidden'); }
+function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
+
+function escapeHtml(str) {
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+function escapeHtmlAttr(str) {
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/"/g, '&quot;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+}
+
+function formatDateShort(dateStr) {
+  const [y, m, d] = dateStr.split('-');
+  return `${parseInt(m)}월 ${parseInt(d)}일`;
+}
+
+function formatTodayLabel(dateStr) {
+  const days = ['일', '월', '화', '수', '목', '금', '토'];
+  const d = new Date(dateStr + 'T00:00:00');
+  return `${formatDateShort(dateStr)} ${days[d.getDay()]}요일`;
+}
+
+/* =========================================================
+   Firebase 연결 (로그인 없이, 고정 문서 하나에 전체 상태 저장)
+   ========================================================= */
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCN2PkVTU_kyuSIxB_SSlEQdfZBV7tNKEQ",
+  authDomain: "tracker-f86d0.firebaseapp.com",
+  projectId: "tracker-f86d0",
+  storageBucket: "tracker-f86d0.firebasestorage.app",
+  messagingSenderId: "969614750843",
+  appId: "1:969614750843:web:944efc90b5c462ca7b5ede"
+};
+
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+const docRef = db.collection('trackerApp').doc('shared');
+
+let saveTimer = null;
+let pendingSave = false;
+let saveFailed = false;
+
+function doActualSave() {
+  pendingSave = false;
+  docRef.set({ data: JSON.stringify(state), updatedAt: Date.now() })
+    .then(() => {
+      saveFailed = false;
+      updateSaveIndicator();
+    })
+    .catch((e) => {
+      console.error('저장 실패:', e);
+      saveFailed = true;
+      updateSaveIndicator();
+    });
+}
+
+function saveState() {
+  pendingSave = true;
+  updateSaveIndicator();
+  // 짧은 시간 내 연속 저장 요청은 마지막 것만 반영 (스테퍼 연타 등 대비)
+  if (saveTimer) clearTimeout(saveTimer);
+  saveTimer = setTimeout(() => {
+    if (saveTimer) { clearTimeout(saveTimer); saveTimer = null; }
+    doActualSave();
+  }, 300);
+}
+
+// 화면이 백그라운드로 가거나 탭이 닫히기 직전, 대기 중인 저장을 즉시 실행
+// (모바일 사파리는 타이머 대기 중 앱 전환/화면 꺼짐이 발생하면 예약된 저장이 실행되지 않을 수 있음)
+function flushPendingSave() {
+  if (saveTimer) {
+    clearTimeout(saveTimer);
+    saveTimer = null;
+    doActualSave();
+  }
+}
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'hidden') flushPendingSave();
+});
+window.addEventListener('pagehide', flushPendingSave);
+
+function updateSaveIndicator() {
+  const el = document.getElementById('save-indicator');
+  if (!el) return;
+  if (saveFailed) {
+    el.textContent = '⚠ 저장 실패 (오프라인이거나 권한 문제)';
+    el.style.color = '#C97B63';
+  } else if (pendingSave) {
+    el.textContent = '저장 중...';
+    el.style.color = '#ABABA6';
+  } else {
+    el.textContent = '';
+  }
+}
+
+async function loadState() {
+  try {
+    const snap = await docRef.get();
+    if (snap.exists && snap.data().data) {
+      const parsed = JSON.parse(snap.data().data);
+      if (parsed && Array.isArray(parsed.subjects) && Array.isArray(parsed.items)) {
+        state = parsed;
+      }
+    }
+  } catch (e) {
+    console.error('불러오기 실패:', e);
+    loadFailed = true;
+  }
+}
+
+async function initApp() {
+  document.getElementById('app').innerHTML = `
+    <div class="screen" style="display:flex;align-items:center;justify-content:center;height:100vh;color:#ABABA6;font-size:14px;">
+      불러오는 중...
+    </div>
+  `;
+  await loadState();
+  render();
+}
+
+/* =========================================================
+   초기화
+   ========================================================= */
+
+let loadFailed = false;
+initApp();
+</script>
+</body>
+</html>
