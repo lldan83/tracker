@@ -400,6 +400,7 @@
       <button class="btn-cancel" onclick="closeModal('modal-edit-log')">취소</button>
       <button class="btn-confirm" onclick="submitEditLog()">저장</button>
     </div>
+    <button class="danger-btn" style="margin-top:10px;" onclick="openDeleteLogConfirm()">이 기록 삭제</button>
   </div>
 </div>
 
@@ -1239,6 +1240,18 @@ function openDeleteItemConfirm(itemId) {
   pendingDeleteAction = () => {
     state.items = state.items.filter(i => i.id !== itemId);
     nav = { screen: 'list', itemId: null };
+  };
+  showModal('modal-confirm-delete');
+}
+
+function openDeleteLogConfirm() {
+  const item = state.items.find(i => i.id === editingLogItemId);
+  if (!item) return;
+  const dateLabel = formatDateShort(editingLogDate);
+  document.getElementById('confirm-delete-text').textContent = `${dateLabel} 기록을 삭제할까요?`;
+  pendingDeleteAction = () => {
+    delete item.logs[editingLogDate];
+    closeModal('modal-edit-log');
   };
   showModal('modal-confirm-delete');
 }
