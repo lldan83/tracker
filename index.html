@@ -115,6 +115,7 @@
     display: flex; align-items: center; justify-content: space-between;
   }
   .nav-left { display: flex; align-items: center; gap: 12px; }
+  .nav-right { display: flex; align-items: center; gap: 4px; }
   .nav .back { font-size: 22px; color: #8A8A85; background: none; border: none; cursor: pointer; padding: 4px; }
   .nav .subject { font-size: 17px; font-weight: 700; }
   .nav .edit-btn {
@@ -200,7 +201,7 @@
   .modal {
     background: #FAFAF9; width: 100%; max-width: 480px;
     border-radius: 24px 24px 0 0; padding: 24px 20px 32px;
-    max-height: 85vh; overflow-y: auto;
+    max-height: 85vh; overflow-y: auto; overflow-x: hidden;
   }
   .modal-title { font-size: 18px; font-weight: 700; margin-bottom: 20px; }
 
@@ -235,7 +236,8 @@
   .btn-confirm:disabled { background: #D8D7D2; }
 
   .row-2 { display: flex; gap: 10px; }
-  .row-2 .field { flex: 1; }
+  .row-2 .field { flex: 1; min-width: 0; }
+  .row-2 .field input[type="date"] { padding: 12px 8px; }
 
   .hint { font-size: 12px; color: #ABABA6; margin-top: -8px; margin-bottom: 16px; }
 
@@ -285,7 +287,7 @@
 
 <div class="modal-overlay hidden" id="modal-add-item">
   <div class="modal">
-    <div class="modal-title">항목 추가</div>
+    <div class="modal-title" id="add-item-modal-title">항목 추가</div>
 
     <div class="field">
       <label>과목</label>
@@ -338,7 +340,7 @@
 
     <div class="modal-actions">
       <button class="btn-cancel" onclick="closeModal('modal-add-item')">취소</button>
-      <button class="btn-confirm" onclick="submitAddItem()">추가</button>
+      <button class="btn-confirm" id="add-item-confirm-btn" onclick="submitAddItem()">추가</button>
     </div>
   </div>
 </div>
@@ -374,6 +376,11 @@
 <div class="modal-overlay hidden" id="modal-edit-item">
   <div class="modal">
     <div class="modal-title">항목 수정</div>
+
+    <div class="field">
+      <label>과목</label>
+      <div class="subject-pick" id="edit-subject-pick-list"></div>
+    </div>
 
     <div class="field">
       <label>항목명</label>
@@ -434,6 +441,7 @@ let pendingDeleteAction = null;
 let editingLogDate = null;
 let editingLogItemId = null;
 let editingItemId = null;
+let editingSubjectIdForItem = null;
 let editingChapterList = []; // [{id: 기존id 또는 null(신규), name}]
 
 /* ---------- 시드 데이터 (목업과 동일한 예시) ---------- */
@@ -812,7 +820,10 @@ function renderDetailScreen(itemId) {
           <button class="back" onclick="goBack()">‹</button>
           <span class="subject">${escapeHtml(item.name)}</span>
         </div>
-        <button class="edit-btn" onclick="openEditItemModal('${item.id}')">수정</button>
+        <div class="nav-right">
+          <button class="edit-btn" onclick="openDuplicateItemModal('${item.id}')">복제</button>
+          <button class="edit-btn" onclick="openEditItemModal('${item.id}')">수정</button>
+        </div>
       </div>
       <div style="padding:0 20px;font-size:12px;color:#ABABA6;">${escapeHtml(subj ? subj.name : '')}</div>
 
@@ -930,6 +941,8 @@ function openAddItemModal() {
     openAddSubjectModal();
     return;
   }
+  document.getElementById('add-item-modal-title').textContent = '항목 추가';
+  document.getElementById('add-item-confirm-btn').textContent = '추가';
   pendingItemType = 'count';
   document.getElementById('type-count').classList.add('active');
   document.getElementById('type-chapter').classList.remove('active');
@@ -945,6 +958,42 @@ function openAddItemModal() {
   renderChapterListInputs();
 
   pendingSubjectIdForItem = state.subjects[0].id;
+  const pickList = document.getElementById('subject-pick-list');
+  pickList.innerHTML = state.subjects.map(s => `
+    <button class="${s.id === pendingSubjectIdForItem ? 'active' : ''}" onclick="pickSubjectForItem('${s.id}')" id="pick-${s.id}">${escapeHtml(s.name)}</button>
+  `).join('');
+
+  showModal('modal-add-item');
+}
+
+function openDuplicateItemModal(itemId) {
+  const item = state.items.find(i => i.id === itemId);
+  if (!item) return;
+
+  document.getElementById('add-item-modal-title').textContent = '항목 복제';
+  document.getElementById('add-item-confirm-btn').textContent = '복제 완료';
+
+  pendingItemType = item.type;
+  document.getElementById('type-count').classList.toggle('active', item.type === 'count');
+  document.getElementById('type-chapter').classList.toggle('active', item.type === 'chapter');
+  document.getElementById('type-hint').textContent = item.type === 'chapter'
+    ? '순서 있는 목차 항목을 순서대로 입력하세요'
+    : '순서 없는 총량 (예: 단어 317개)';
+  document.getElementById('count-target-field').classList.toggle('hidden', item.type === 'chapter');
+  document.getElementById('chapter-list-field').classList.toggle('hidden', item.type !== 'chapter');
+
+  document.getElementById('input-item-name').value = item.name;
+  document.getElementById('input-target').value = item.type === 'count' ? item.target : '';
+  document.getElementById('input-start-date').value = '';
+  document.getElementById('input-end-date').value = '';
+
+  // 목차 이름만 복사(새 항목이므로 새 id로 다시 생성됨), 기록(logs)은 복사하지 않고 빈 상태로 시작
+  pendingChapterList = item.type === 'chapter'
+    ? (item.chapters || []).map(c => c.name)
+    : ['', ''];
+  renderChapterListInputs();
+
+  pendingSubjectIdForItem = item.subjectId;
   const pickList = document.getElementById('subject-pick-list');
   pickList.innerHTML = state.subjects.map(s => `
     <button class="${s.id === pendingSubjectIdForItem ? 'active' : ''}" onclick="pickSubjectForItem('${s.id}')" id="pick-${s.id}">${escapeHtml(s.name)}</button>
@@ -1156,6 +1205,12 @@ function openEditItemModal(itemId) {
   document.getElementById('edit-input-start-date').value = item.startDate;
   document.getElementById('edit-input-end-date').value = item.endDate;
 
+  editingSubjectIdForItem = item.subjectId;
+  const editPickList = document.getElementById('edit-subject-pick-list');
+  editPickList.innerHTML = state.subjects.map(s => `
+    <button class="${s.id === editingSubjectIdForItem ? 'active' : ''}" onclick="pickSubjectForEditItem('${s.id}')" id="edit-pick-${s.id}">${escapeHtml(s.name)}</button>
+  `).join('');
+
   if (item.type === 'chapter') {
     document.getElementById('edit-count-target-field').classList.add('hidden');
     document.getElementById('edit-chapter-list-field').classList.remove('hidden');
@@ -1168,6 +1223,13 @@ function openEditItemModal(itemId) {
   }
 
   showModal('modal-edit-item');
+}
+
+function pickSubjectForEditItem(subjectId) {
+  editingSubjectIdForItem = subjectId;
+  state.subjects.forEach(s => {
+    document.getElementById(`edit-pick-${s.id}`).classList.toggle('active', s.id === subjectId);
+  });
 }
 
 function renderEditChapterListInputs() {
@@ -1217,6 +1279,7 @@ function submitEditItem() {
   if (endDate < startDate) { alert('목표일이 시작일보다 빠를 수 없어요.'); return; }
 
   item.name = name;
+  item.subjectId = editingSubjectIdForItem;
   item.startDate = startDate;
   item.endDate = endDate;
 
