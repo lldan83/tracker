@@ -109,6 +109,35 @@
 
   .divider { height: 1px; background: #F0EFEB; margin: 4px 20px 0; }
 
+  /* ===== 오늘 할 일 요약 ===== */
+  .todo-summary { margin: 0 20px 18px; }
+  .todo-summary-collapse {
+    background: #fff; border: 1px solid #E8E7E3; border-radius: 16px;
+    padding: 14px 16px; display: flex; align-items: center; justify-content: space-between;
+    cursor: pointer;
+  }
+  .todo-summary-left { display: flex; align-items: center; gap: 10px; }
+  .todo-summary-title { font-size: 14px; font-weight: 700; }
+  .todo-summary-badge {
+    background: #1C1C1A; color: #FAFAF9; font-size: 11px; font-weight: 700;
+    border-radius: 100px; min-width: 20px; height: 20px; padding: 0 6px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .todo-summary-chevron { font-size: 12px; color: #ABABA6; font-weight: 600; }
+  .todo-summary-collapse.expanded { border-radius: 16px 16px 0 0; border-bottom: none; }
+  .todo-summary-list {
+    background: #fff; border: 1px solid #E8E7E3; border-top: none; border-radius: 0 0 16px 16px;
+    overflow: hidden;
+  }
+  .todo-row {
+    display: flex; align-items: center; gap: 10px; padding: 12px 16px;
+    font-size: 13.5px; font-weight: 600; border-top: 1px solid #F0EFEB; cursor: pointer;
+  }
+  .todo-row .dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .todo-name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .todo-amt { font-size: 12px; font-weight: 500; color: #ABABA6; flex-shrink: 0; }
+  .todo-amt.in-progress { color: #C97B63; font-weight: 700; }
+
   /* ===== 상세 화면 ===== */
   .nav {
     padding: 8px 20px 4px;
@@ -620,6 +649,15 @@ function calcTodayProgressRing(item, today) {
   return Math.min(pct, 100);
 }
 
+// 오늘 아직 안 한 만큼(잔여량) 실시간 계산. 로그를 등록할 때마다 재계산됨.
+function calcTodayRemaining(item, today) {
+  const goalInfo = calcTodayGoal(item, today);
+  const cumToday = getCumulativeAt(item, today);
+  const doneToday = Math.max(0, cumToday - goalInfo.cumulativeYesterday);
+  const remainingToday = Math.max(0, goalInfo.todayGoal - doneToday);
+  return { todayGoal: goalInfo.todayGoal, doneToday, remainingToday };
+}
+
 function ddayLabel(endDate, today) {
   const diff = daysBetween(today, endDate);
   if (diff > 0) return `D-${diff}`;
@@ -630,6 +668,59 @@ function ddayLabel(endDate, today) {
 /* =========================================================
    렌더링
    ========================================================= */
+
+// "오늘 할 일" 요약 펼침 상태 (세션 동안만 유지, 새로고침하면 초기화됨)
+let todoExpanded = false;
+
+function toggleTodoSummary() {
+  todoExpanded = !todoExpanded;
+  render();
+}
+
+function getTodaySummaryItems(today) {
+  const list = [];
+  state.subjects.forEach(subj => {
+    state.items.filter(i => i.subjectId === subj.id).forEach(item => {
+      const info = calcTodayRemaining(item, today);
+      if (info.remainingToday > 0) {
+        list.push({ item, info });
+      }
+    });
+  });
+  return list;
+}
+
+function renderTodoSummary(today) {
+  const summaryItems = getTodaySummaryItems(today);
+  if (summaryItems.length === 0) return '';
+
+  const rowsHtml = summaryItems.map(({ item, info }) => {
+    const color = item.color || COLORS[0];
+    const amtClass = info.doneToday > 0 ? 'todo-amt in-progress' : 'todo-amt';
+    return `
+      <div class="todo-row" onclick="openDetail('${item.id}')">
+        <span class="dot" style="background:${color}"></span>
+        <span class="todo-name">${escapeHtml(item.name)}</span>
+        <span class="${amtClass}">${info.remainingToday}개 남음</span>
+      </div>
+    `;
+  }).join('');
+
+  const chevronLabel = todoExpanded ? '펼침 ▴' : '접힘 ▾';
+
+  return `
+    <div class="todo-summary">
+      <div class="todo-summary-collapse ${todoExpanded ? 'expanded' : ''}" onclick="toggleTodoSummary()">
+        <div class="todo-summary-left">
+          <div class="todo-summary-title">오늘 할 일</div>
+          <div class="todo-summary-badge">${summaryItems.length}</div>
+        </div>
+        <div class="todo-summary-chevron">${chevronLabel}</div>
+      </div>
+      ${todoExpanded ? `<div class="todo-summary-list">${rowsHtml}</div>` : ''}
+    </div>
+  `;
+}
 
 function render() {
   const app = document.getElementById('app');
@@ -699,6 +790,7 @@ function renderListScreen() {
         </div>
       </div>
       <div class="today-label">${formatTodayLabel(today)} <span id="save-indicator" style="font-size:11px;"></span></div>
+      ${renderTodoSummary(today)}
       ${sectionsHtml}
     </div>
   `;
