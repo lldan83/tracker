@@ -107,6 +107,16 @@
   .card-today .value.overdue { color: #C97B63; }
   .dday { font-size: 10px; color: #ABABA6; margin-top: 2px; }
 
+  .order-controls { display: flex; flex-direction: column; gap: 2px; flex-shrink: 0; }
+  .order-btn {
+    width: 22px; height: 18px; border: none; background: none; cursor: pointer;
+    font-size: 9px; color: #C4C4BE; display: flex; align-items: center; justify-content: center;
+    border-radius: 5px;
+  }
+  .order-btn:active { background: #F0EFEB; }
+  .order-btn:disabled { color: #E8E7E3; cursor: default; }
+  .order-btn:disabled:active { background: none; }
+
   .divider { height: 1px; background: #F0EFEB; margin: 4px 20px 0; }
 
   /* ===== 오늘 할 일 요약 ===== */
@@ -185,6 +195,14 @@
   .stat .value.overdue { color: #C97B63; }
 
   .section-title { padding: 8px 20px 10px; font-size: 13px; font-weight: 600; color: #8A8A85; }
+  .section-title-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 8px 20px 10px;
+  }
+  .section-title-row .section-title { padding: 0; }
+  .add-log-btn {
+    font-size: 13px; color: #6B84A0; background: none; border: none; cursor: pointer; font-weight: 600;
+  }
 
   .log-input {
     margin: 0 20px 20px; border: 1px solid #E8E7E3; border-radius: 14px;
@@ -417,9 +435,14 @@
 <div class="modal-overlay hidden" id="modal-edit-log">
   <div class="modal">
     <div class="modal-title" id="edit-log-title">기록 수정</div>
+    <div class="field hidden" id="edit-log-date-field">
+      <label>날짜</label>
+      <input type="date" id="input-edit-log-date" onchange="refreshAddLogBounds()">
+    </div>
     <div class="field" id="edit-log-number-field">
       <label id="edit-log-label">그 날짜까지 완료한 양</label>
       <input type="number" id="input-edit-log-value" min="0">
+      <div class="hint" id="edit-log-hint" style="font-size:11px;color:#ABABA6;margin-top:4px;"></div>
     </div>
     <div class="field hidden" id="edit-log-select-field">
       <label>그 날짜까지 완료한 목차</label>
@@ -429,7 +452,7 @@
       <button class="btn-cancel" onclick="closeModal('modal-edit-log')">취소</button>
       <button class="btn-confirm" onclick="submitEditLog()">저장</button>
     </div>
-    <button class="danger-btn" style="margin-top:10px;" onclick="openDeleteLogConfirm()">이 기록 삭제</button>
+    <button class="danger-btn" id="edit-log-delete-btn" style="margin-top:10px;" onclick="openDeleteLogConfirm()">이 기록 삭제</button>
   </div>
 </div>
 
@@ -522,6 +545,7 @@ let pendingSubjectIdForItem = null;
 let pendingDeleteAction = null;
 let editingLogDate = null;
 let editingLogItemId = null;
+let addLogMode = false; // true면 '지난 기록 추가' 모드, false면 기존 기록 수정 모드
 let editingItemId = null;
 let editingSubjectIdForItem = null;
 let editingChapterList = []; // [{id: 기존id 또는 null(신규), name}]
@@ -612,6 +636,17 @@ function getCumulativeAt(item, dateStr) {
   const dates = Object.keys(logs).filter(d => d <= dateStr).sort();
   if (dates.length === 0) return 0;
   return resolveLogNumeric(item, logs[dates[dates.length - 1]]);
+}
+
+// 특정 날짜에 기록을 넣거나 고칠 때, 시간 순서상 값이 허용되는 범위(prevCum ~ nextCum)를 계산.
+// excludeDate: 지금 수정 중인 기록 자신은 비교 대상에서 제외.
+function calcLogBounds(item, date, excludeDate) {
+  const dates = Object.keys(item.logs).filter(d => d !== excludeDate);
+  const prevDates = dates.filter(d => d < date).sort();
+  const nextDates = dates.filter(d => d > date).sort();
+  const prevCum = prevDates.length > 0 ? resolveLogNumeric(item, item.logs[prevDates[prevDates.length - 1]]) : 0;
+  const nextCum = nextDates.length > 0 ? resolveLogNumeric(item, item.logs[nextDates[0]]) : Infinity;
+  return { prevCum, nextCum };
 }
 
 function calcTodayGoal(item, today) {
@@ -732,6 +767,25 @@ function render() {
   updateSaveIndicator();
 }
 
+// 같은 과목 안에서 항목 순서를 한 칸 위/아래로 이동 (direction: -1 위로, 1 아래로)
+function moveItem(itemId, direction) {
+  const item = state.items.find(i => i.id === itemId);
+  if (!item) return;
+  const sameSubjectItems = state.items.filter(i => i.subjectId === item.subjectId);
+  const posInSubject = sameSubjectItems.findIndex(i => i.id === itemId);
+  const targetPos = posInSubject + direction;
+  if (targetPos < 0 || targetPos >= sameSubjectItems.length) return;
+  const targetItem = sameSubjectItems[targetPos];
+
+  const idxA = state.items.indexOf(item);
+  const idxB = state.items.indexOf(targetItem);
+  state.items[idxA] = targetItem;
+  state.items[idxB] = item;
+
+  render();
+  saveState();
+}
+
 function renderListScreen() {
   const today = todayStr();
 
@@ -761,8 +815,8 @@ function renderListScreen() {
     if (items.length === 0) {
       cardsHtml = `<div style="font-size:13px;color:#C4C4BE;padding:4px 0 8px;">항목이 없어요</div>`;
     } else {
-      items.forEach((item) => {
-        cardsHtml += renderItemCard(item, today);
+      items.forEach((item, idx) => {
+        cardsHtml += renderItemCard(item, today, idx === 0, idx === items.length - 1);
       });
     }
     sectionsHtml += `
@@ -796,7 +850,7 @@ function renderListScreen() {
   `;
 }
 
-function renderItemCard(item, today) {
+function renderItemCard(item, today, isFirst, isLast) {
   const color = item.color || COLORS[0];
   const overall = calcOverallProgress(item, today);
   const goalInfo = calcTodayGoal(item, today);
@@ -817,6 +871,10 @@ function renderItemCard(item, today) {
 
   return `
     <div class="card" onclick="openDetail('${item.id}')">
+      <div class="order-controls">
+        <button class="order-btn" ${isFirst ? 'disabled' : ''} onclick="event.stopPropagation(); moveItem('${item.id}', -1)">▲</button>
+        <button class="order-btn" ${isLast ? 'disabled' : ''} onclick="event.stopPropagation(); moveItem('${item.id}', 1)">▼</button>
+      </div>
       <div class="ring">
         <svg width="48" height="48">
           <circle class="ring-bg" cx="24" cy="24" r="${r}"></circle>
@@ -1005,7 +1063,10 @@ function renderDetailScreen(itemId) {
       <div class="section-title">오늘 기록</div>
       ${logInputHtml}
 
-      <div class="section-title">최근 기록</div>
+      <div class="section-title-row">
+        <div class="section-title">최근 기록</div>
+        ${item.startDate <= addDaysStr(today, -1) ? `<button class="add-log-btn" onclick="openAddLog('${item.id}')">+ 지난 기록 추가</button>` : ''}
+      </div>
       <div class="history">${historyHtml}</div>
 
       <div class="danger-zone">
@@ -1265,48 +1326,126 @@ function submitAddItem() {
    모달: 과거 기록 수정
    ========================================================= */
 
-function openEditLog(itemId, date) {
-  const item = state.items.find(i => i.id === itemId);
-  if (!item) return;
-  editingLogItemId = itemId;
-  editingLogDate = date;
-  document.getElementById('edit-log-title').textContent = `${formatDateShort(date)} 기록 수정`;
+// 날짜/제외날짜 기준으로 앞뒤 기록 범위를 계산해서, 값 입력 필드(숫자 또는 목차 드롭다운)를 채워줌.
+// presetValue: 기존 값으로 미리 채워둘 값 (없으면 prevCum으로 기본값 설정)
+function populateLogValueFields(item, date, excludeDate, presetValue) {
+  const { prevCum, nextCum } = calcLogBounds(item, date, excludeDate);
 
   if (item.type === 'chapter' && item.chapters) {
     document.getElementById('edit-log-number-field').classList.add('hidden');
     document.getElementById('edit-log-select-field').classList.remove('hidden');
     const select = document.getElementById('input-edit-log-select');
-    const rawVal = item.logs[date];
-    const currentId = rawVal && typeof rawVal === 'object' ? rawVal.id : null;
-    select.innerHTML = item.chapters.map((chapter) => {
-      const selected = chapter.id === currentId ? 'selected' : '';
-      return `<option value="${escapeHtmlAttr(chapter.id)}" ${selected}>${escapeHtml(chapter.name)}</option>`;
+    const currentId = presetValue && typeof presetValue === 'object' ? presetValue.id : null;
+    select.innerHTML = item.chapters.map((chapter, idx) => {
+      const posValue = idx + 1;
+      const disabled = (posValue < prevCum || posValue > nextCum) ? 'disabled' : '';
+      const selected = currentId ? (chapter.id === currentId ? 'selected' : '') : (posValue === prevCum ? 'selected' : '');
+      return `<option value="${escapeHtmlAttr(chapter.id)}" ${selected} ${disabled}>${escapeHtml(chapter.name)}</option>`;
     }).join('');
   } else {
     document.getElementById('edit-log-number-field').classList.remove('hidden');
     document.getElementById('edit-log-select-field').classList.add('hidden');
-    document.getElementById('edit-log-label').textContent = '그날까지 완료한 양';
-    document.getElementById('input-edit-log-value').value = item.logs[date];
+    document.getElementById('edit-log-label').textContent = '그 날짜까지 완료한 양';
+    const valInput = document.getElementById('input-edit-log-value');
+    valInput.value = (presetValue !== undefined && presetValue !== null) ? presetValue : prevCum;
+    valInput.min = prevCum;
+    if (isFinite(nextCum)) valInput.setAttribute('max', nextCum); else valInput.removeAttribute('max');
+    document.getElementById('edit-log-hint').textContent = isFinite(nextCum)
+      ? `입력 가능 범위: ${prevCum} ~ ${nextCum}개 (다른 날짜 기록과 순서가 맞아야 해요)`
+      : `${prevCum}개 이상 입력 (이전 기록보다 적을 수 없어요)`;
   }
+}
 
+function openEditLog(itemId, date) {
+  const item = state.items.find(i => i.id === itemId);
+  if (!item) return;
+  addLogMode = false;
+  editingLogItemId = itemId;
+  editingLogDate = date;
+  document.getElementById('edit-log-title').textContent = `${formatDateShort(date)} 기록 수정`;
+  document.getElementById('edit-log-date-field').classList.add('hidden');
+  document.getElementById('edit-log-delete-btn').classList.remove('hidden');
+  populateLogValueFields(item, date, date, item.logs[date]);
   showModal('modal-edit-log');
+}
+
+// 시작일 이후 ~ 오늘 이전, 아직 기록이 없던 날짜에 새 기록을 추가하는 모달
+function openAddLog(itemId) {
+  const item = state.items.find(i => i.id === itemId);
+  if (!item) return;
+  const today = todayStr();
+  const yesterday = addDaysStr(today, -1);
+  if (item.startDate > yesterday) return; // 추가할 수 있는 과거 날짜가 없음
+
+  addLogMode = true;
+  editingLogItemId = itemId;
+  editingLogDate = null;
+
+  document.getElementById('edit-log-title').textContent = '지난 기록 추가';
+  document.getElementById('edit-log-date-field').classList.remove('hidden');
+  document.getElementById('edit-log-delete-btn').classList.add('hidden');
+
+  const dateInput = document.getElementById('input-edit-log-date');
+  dateInput.min = item.startDate;
+  dateInput.max = yesterday;
+  dateInput.value = yesterday;
+
+  populateLogValueFields(item, yesterday, null, null);
+  showModal('modal-edit-log');
+}
+
+// 추가 모드에서 날짜를 바꿀 때마다 입력 가능 범위(허용값/목차)를 다시 계산
+function refreshAddLogBounds() {
+  if (!addLogMode) return;
+  const item = state.items.find(i => i.id === editingLogItemId);
+  if (!item) return;
+  const dateInput = document.getElementById('input-edit-log-date');
+  let date = dateInput.value;
+  if (!date) return;
+  if (date < dateInput.min) { date = dateInput.min; dateInput.value = date; }
+  if (date > dateInput.max) { date = dateInput.max; dateInput.value = date; }
+  populateLogValueFields(item, date, null, null);
 }
 
 function submitEditLog() {
   const item = state.items.find(i => i.id === editingLogItemId);
   if (!item) return;
 
+  let date = editingLogDate;
+  if (addLogMode) {
+    date = document.getElementById('input-edit-log-date').value;
+    const today = todayStr();
+    const yesterday = addDaysStr(today, -1);
+    if (!date || date < item.startDate || date > yesterday) {
+      alert('시작일 이후, 오늘 이전 날짜만 선택할 수 있어요.');
+      return;
+    }
+  }
+
+  const excludeDate = addLogMode ? null : editingLogDate;
+  const { prevCum, nextCum } = calcLogBounds(item, date, excludeDate);
+
   if (item.type === 'chapter' && item.chapters) {
     const chapterId = document.getElementById('input-edit-log-select').value;
     const idx = item.chapters.findIndex(c => c.id === chapterId);
     if (idx < 0) return;
-    item.logs[editingLogDate] = { id: chapterId, n: idx + 1 };
+    const posValue = idx + 1;
+    if (posValue < prevCum || posValue > nextCum) {
+      alert('다른 날짜의 기록과 순서가 맞지 않는 값이에요. 앞뒤 기록을 확인해주세요.');
+      return;
+    }
+    item.logs[date] = { id: chapterId, n: posValue };
   } else {
     const val = parseInt(document.getElementById('input-edit-log-value').value, 10);
     if (isNaN(val) || val < 0) { alert('올바른 값을 입력해주세요.'); return; }
-    item.logs[editingLogDate] = val;
+    if (val < prevCum || val > nextCum) {
+      alert('다른 날짜의 기록과 순서가 맞지 않는 값이에요. 앞뒤 기록을 확인해주세요.');
+      return;
+    }
+    item.logs[date] = val;
   }
 
+  addLogMode = false;
   closeModal('modal-edit-log');
   render();
   saveState();
